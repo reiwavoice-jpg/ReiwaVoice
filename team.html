@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>運営チーム | 令和ボイス</title>
+    <style>
+        :root {
+            --main-bg: #0d0d0d;
+            --text-color: #f2f2f2;
+            --accent-red: #e60000;
+            --accent-dark-red: #990000;
+            --card-bg: #1a1a1a;
+            --border-color: #333;
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif; background-color: var(--main-bg); color: var(--text-color); line-height: 1.8; }
+
+        /* ===== ナビゲーション ===== */
+        header { background-color: #000; padding: 0 5%; border-bottom: 2px solid var(--accent-red); position: sticky; top: 0; z-index: 100; }
+        .header-inner { display: flex; justify-content: space-between; align-items: center; height: 60px; }
+        .site-logo { font-size: 1.5rem; font-weight: bold; letter-spacing: 2px; color: #fff; text-decoration: none; }
+        nav { display: flex; align-items: center; gap: 5px; }
+        nav a { color: #ccc; text-decoration: none; padding: 8px 14px; border-radius: 4px; font-size: 0.9rem; transition: 0.2s; }
+        nav a:hover { color: #fff; background: #1a1a1a; }
+        nav a.active { color: var(--accent-red); border-bottom: 2px solid var(--accent-red); border-radius: 0; }
+        .nav-cta { background: var(--accent-red) !important; color: #fff !important; font-weight: bold; border-radius: 4px !important; border-bottom: none !important; }
+        .nav-cta:hover { background: var(--accent-dark-red) !important; }
+        .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 5px; }
+        .hamburger span { display: block; width: 22px; height: 2px; background: #fff; }
+
+        /* ===== ページヘッダー ===== */
+        .page-hero { padding: 60px 10%; text-align: center; background: linear-gradient(to bottom, #1a0000, #0d0d0d); border-bottom: 1px solid var(--border-color); }
+        .page-hero h1 { font-size: 2.5rem; color: var(--accent-red); margin-bottom: 10px; }
+        .page-hero p { color: #aaa; font-size: 1.1rem; }
+
+        /* ===== コンテンツ ===== */
+        .container { max-width: 1000px; margin: 0 auto; padding: 60px 20px; }
+        .section-title { font-size: 1.8rem; border-left: 5px solid var(--accent-red); padding-left: 15px; margin-bottom: 30px; margin-top: 60px; }
+        .section-title:first-child { margin-top: 0; }
+
+        /* ===== メンバーカード ===== */
+        .member-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 40px; }
+        .member-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; position: relative; }
+        .member-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(to right, var(--accent-red), var(--accent-dark-red)); }
+        .member-photo { width: 100%; height: 320px; object-fit: cover; object-position: center top; display: block; }
+        .member-body { padding: 28px; }
+        .member-role { display: inline-block; background: #2a0000; color: var(--accent-red); border: 1px solid var(--accent-red); font-size: 0.75rem; padding: 4px 12px; border-radius: 20px; margin-bottom: 12px; }
+        .member-name { font-size: 2rem; font-weight: bold; color: #fff; margin: 0 0 4px; }
+        .member-name-en { font-size: 0.85rem; color: #666; margin-bottom: 10px; letter-spacing: 1px; }
+        .member-since { font-size: 0.82rem; color: #888; margin-bottom: 18px; padding: 6px 12px; background: #111; border-radius: 4px; display: inline-block; }
+        .member-quote { border-left: 3px solid var(--accent-red); padding: 14px 18px; background: #111; color: #ddd; font-size: 0.95rem; line-height: 2; margin-bottom: 22px; border-radius: 0 6px 6px 0; }
+        .member-sns { display: flex; gap: 10px; flex-wrap: wrap; }
+        .sns-link { display: inline-flex; align-items: center; gap: 6px; color: #aaa; text-decoration: none; font-size: 0.85rem; padding: 7px 16px; border: 1px solid #444; border-radius: 20px; transition: 0.2s; }
+        .sns-link:hover { border-color: var(--accent-red); color: #fff; background: #1a0000; }
+
+        /* ===== 賛同議員セクション ===== */
+        .recruiting-banner { background: linear-gradient(135deg, #1a0000, #2a0000); border: 1px solid var(--accent-red); border-radius: 12px; padding: 44px 40px; text-align: center; margin-bottom: 40px; }
+        .recruiting-banner h3 { font-size: 1.6rem; color: #fff; margin: 0 0 12px; }
+        .recruiting-banner p { color: #bbb; margin-bottom: 28px; line-height: 2; font-size: 1rem; }
+        .btn-recruit { display: inline-block; background: var(--accent-red); color: #fff; text-decoration: none; padding: 14px 36px; border-radius: 6px; font-weight: bold; font-size: 1rem; transition: 0.2s; }
+        .btn-recruit:hover { background: var(--accent-dark-red); transform: translateY(-1px); }
+
+        .pref-section-label { color: #666; font-size: 0.9rem; margin-bottom: 16px; margin-top: 0; }
+        .pref-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+        .pref-item { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 10px; text-align: center; transition: 0.2s; }
+        .pref-item.has-member { border-color: var(--accent-red); background: #1a0000; }
+        .pref-name { font-size: 0.9rem; color: #ccc; margin-bottom: 5px; font-weight: bold; }
+        .pref-status { font-size: 0.72rem; color: #555; }
+        .pref-member-name { font-size: 0.8rem; color: #ddd; margin-top: 4px; }
+        .pref-member-role { font-size: 0.68rem; color: #888; }
+
+        /* ===== フッター ===== */
+        footer { background: #000; border-top: 1px solid var(--border-color); padding: 30px 5%; text-align: center; color: #666; font-size: 0.85rem; }
+        footer a { color: #888; text-decoration: none; margin: 0 10px; }
+        footer a:hover { color: #fff; }
+
+        /* ===== レスポンシブ ===== */
+        @media (max-width: 768px) {
+            nav { display: none; flex-direction: column; position: absolute; top: 60px; left: 0; right: 0; background: #000; padding: 20px; border-bottom: 1px solid var(--border-color); }
+            nav.open { display: flex; }
+            .hamburger { display: flex; }
+            .member-grid { grid-template-columns: 1fr; }
+            .page-hero h1 { font-size: 1.8rem; }
+            .recruiting-banner { padding: 28px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-inner">
+            <a href="index.html" class="site-logo">令和ボイス</a>
+            <nav id="main-nav">
+                <a href="about.html">使い方</a>
+                <a href="form.html">不満を投稿</a>
+                <a href="petitions.html">陳情書一覧</a>
+                <a href="results.html">活動実績</a>
+                <a href="team.html" class="active">チーム</a>
+                <a href="form.html" class="nav-cta">今すぐ声を上げる</a>
+            </nav>
+            <div class="hamburger" onclick="toggleNav()">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </header>
+
+    <div class="page-hero">
+        <h1>運営チーム</h1>
+        <p>令和ボイスを動かす、現役議員と開発者による最強のタッグ。</p>
+    </div>
+
+    <div class="container">
+
+        <!-- 運営メンバー -->
+        <h2 class="section-title">👥 運営メンバー</h2>
+        <div class="member-grid">
+
+            <!-- へずまりゅう -->
+            <div class="member-card">
+                <img src="./images/hezuma.jpg" alt="へずまりゅう" class="member-photo">
+                <div class="member-body">
+                    <div class="member-role">代表 ／ 奈良市議会議員</div>
+                    <div class="member-name">へずまりゅう</div>
+                    <div class="member-name-en">Hezuma Ryu</div>
+                    <div class="member-since">🏛 2025年7月31日 奈良市議会議員 就任</div>
+                    <div class="member-quote">「口先だけで逃げ回る行政に、これからは俺が『最強の凸（とつ）』をしてやる！現役世代の怒りは、俺が代わりに叩きつけてやる！」</div>
+                    <div class="member-sns">
+                        <a href="https://x.com/hezuruy" target="_blank" rel="noopener" class="sns-link">𝕏 Twitter/X</a>
+                        <a href="https://www.instagram.com/hezumaryuaaa/" target="_blank" rel="noopener" class="sns-link">📷 Instagram</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 丸吉孝文 -->
+            <div class="member-card">
+                <img src="./images/maruyoshi.jpg" alt="丸吉孝文" class="member-photo">
+                <div class="member-body">
+                    <div class="member-role">秘書 ／ 令和ボイス開発者 ／ AIエンジニア</div>
+                    <div class="member-name">丸吉孝文</div>
+                    <div class="member-name-en">Maruyoshi Takafumi</div>
+                    <div class="member-since" style="visibility:hidden;">―</div>
+                    <div class="member-quote">「テクノロジーは、権力を持たない現役世代の『最強の武器』です。AIの力で行政の嘘を可視化し、システムで政治をハックします。理不尽な搾取はここで終わらせます。」</div>
+                    <div class="member-sns">
+                        <a href="https://www.youtube.com/@nano_illust.34" target="_blank" rel="noopener" class="sns-link">▶ YouTube</a>
+                        <a href="https://twitter.com/takafumi_1984" target="_blank" rel="noopener" class="sns-link">𝕏 Twitter/X</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 賛同議員 -->
+        <h2 class="section-title">🏛 賛同議員</h2>
+
+        <div class="recruiting-banner">
+            <h3>🔥 賛同してくださる議員を募集中</h3>
+            <p>令和ボイスの理念に共感し、市民の声を議会に届けることに<br>力を貸してくださる全国の地方議員の方を募集しています。<br>あなたの地域の声を、一緒に政治に変えましょう。</p>
+            <a href="mailto:info@health-gear.net" class="btn-recruit">🙋 賛同議員として登録する</a>
+        </div>
+
+        <p class="pref-section-label">都道府県別 賛同議員一覧</p>
+        <div class="pref-grid" id="pref-grid"></div>
+
+    </div>
+
+    <footer>
+        <p>© 2025 令和ボイス All Rights Reserved.</p>
+        <p>
+            <a href="index.html">トップ</a>
+            <a href="about.html">使い方</a>
+            <a href="form.html">不満を投稿</a>
+            <a href="petitions.html">陳情書一覧</a>
+            <a href="results.html">活動実績</a>
+            <a href="team.html">チーム</a>
+        </p>
+    </footer>
+
+    <script>
+        function toggleNav() {
+            document.getElementById('main-nav').classList.toggle('open');
+        }
+
+        // ===== 都道府県グリッド =====
+        const PREFS = [
+            '北海道','青森','岩手','宮城','秋田','山形','福島',
+            '茨城','栃木','群馬','埼玉','千葉','東京','神奈川',
+            '新潟','富山','石川','福井','山梨','長野','岐阜','静岡','愛知','三重',
+            '滋賀','京都','大阪','兵庫','奈良','和歌山',
+            '鳥取','島根','岡山','広島','山口',
+            '徳島','香川','愛媛','高知',
+            '福岡','佐賀','長崎','熊本','大分','宮崎','鹿児島','沖縄'
+        ];
+
+        // 賛同議員データ（議員が増えたらここに追加）
+        const MEMBERS = {
+            '奈良': [{ name: 'へずまりゅう', role: '奈良市議会議員' }]
+        };
+
+        const grid = document.getElementById('pref-grid');
+        PREFS.forEach(pref => {
+            const members = MEMBERS[pref] || [];
+            const item = document.createElement('div');
+            item.className = 'pref-item' + (members.length > 0 ? ' has-member' : '');
+            if (members.length > 0) {
+                item.innerHTML = `
+                    <div class="pref-name">${pref}</div>
+                    ${members.map(m => `
+                        <div class="pref-member-name">${m.name}</div>
+                        <div class="pref-member-role">${m.role}</div>
+                    `).join('')}
+                `;
+            } else {
+                item.innerHTML = `
+                    <div class="pref-name">${pref}</div>
+                    <div class="pref-status">募集中</div>
+                `;
+            }
+            grid.appendChild(item);
+        });
+    </script>
+
+</body>
+</html>
