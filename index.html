@@ -456,11 +456,14 @@
                 const link  = r.petitionUrl
                     ? `<a href="${escHtml(r.petitionUrl)}" target="_blank" class="doc-link">📄 陳情書全文を読む</a>`
                     : `<span style="color:#555;">陳情書生成中…</span>`;
+                const displayText = r.title
+                    ? escHtml(r.title)
+                    : (r.category ? `【${escHtml(r.category)}】に関する市民の声` : '行政への陳情');
                 return `
                 <div class="petition-card">
                     <div class="status-badge">${badge}</div>
                     <h3 style="color:#fff;">【${escHtml(loc)}】${cat}への追及</h3>
-                    <p style="color:#bbb;">${r.complaint ? escHtml(r.complaint.slice(0, 100)) + '…' : ''}</p>
+                    <p style="color:#bbb;">${displayText}</p>
                     <div class="action-area">
                         ${link}
                         <button class="like-btn" disabled>
