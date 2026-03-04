@@ -291,6 +291,9 @@
 // ▼ Googleスプレッドシート「ウェブに公開」で発行したCSV URL
 const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTCYqqRhudBfLXTNMov8_H4EPI4lWO5H-fYOsyq8W-nUnHmaIhrSFzshpiE21iARgxIUAOvai_kB38t/pub?gid=1710597455&single=true&output=csv';
 
+// ▼ GAS デプロイ後にURLを貼り付ける（reiwavoice_api.gs をデプロイして取得）
+const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbyTXAzY678xNjLbi0l0idqT3jMajWY7RZK6fLFnIC2JjZVI0x64FlFncSLdxg-XzWESNg/exec';
+
 const PER_PAGE  = 10; // 1ページあたりの表示件数
 
 // 列インデックス（0始まり） ← スプレッドシートの列構成に基づく
@@ -308,18 +311,18 @@ const COL = {
     // 10: Q8 メール（非表示）
     status       : 11,  // ステータス
     petitionUrl  : 12,  // 生成された陳情書URL
-    emailStatus  : 13   // 送信メールステータス（非表示）
+    // 13: 送信メールステータス（非表示）
+    likeCount    : 14,  // O列: 賛同数（スプレッドシートに追加が必要）
 };
 
 // =====================================================================
 // 状態管理
 // =====================================================================
-let allPetitions    = [];   // 全データ
-let filteredData    = [];   // フィルタ後データ
-let currentPage     = 1;
-let likedSet        = new Set(JSON.parse(localStorage.getItem('liked') || '[]'));
-let likeCounts      = JSON.parse(localStorage.getItem('likeCounts') || '{}');
-let activeFilters   = { status: 'all', prefecture: 'all', category: 'all', keyword: '' };
+let allPetitions  = [];
+let filteredData  = [];
+let currentPage   = 1;
+let likedSet      = new Set(JSON.parse(localStorage.getItem('liked') || '[]'));
+let activeFilters = { status: 'all', prefecture: 'all', category: 'all', keyword: '' };
 
 // =====================================================================
 // データ取得（CSV版）
@@ -382,12 +385,12 @@ function parseCSV(text) {
 function rowsToObjects(rows) {
     if (!rows || rows.length < 2) return [];
 
-    // 1行目はヘッダーなのでスキップ（index 1〜）
     return rows.slice(1)
-        .map((cols, idx) => {
+        .map((cols, sliceIdx) => {
             const get = (i) => (cols[i] !== undefined ? cols[i].trim() : '');
             return {
-                id          : idx,
+                id          : sliceIdx,
+                sheetRowNum : sliceIdx + 2,      // スプレッドシートの実際の行番号（GAS用）
                 timestamp   : get(COL.timestamp),
                 prefecture  : get(COL.prefecture),
                 municipality: get(COL.municipality),
@@ -395,10 +398,10 @@ function rowsToObjects(rows) {
                 category    : get(COL.category),
                 status      : get(COL.status),
                 petitionUrl : get(COL.petitionUrl),
+                likeCount   : parseInt(get(COL.likeCount)) || 0,  // O列: 賛同数
             };
         })
         .filter(p =>
-            // 空行 & ヘッダー文字列の混入を除外
             p.prefecture
             && p.prefecture !== 'Q1. お住まいの都道府県を選択してください'
             && (p.complaint || p.petitionUrl)
@@ -485,7 +488,7 @@ function buildCard(p) {
 
     const likeKey   = `petition_${p.id}`;
     const isLiked   = likedSet.has(likeKey);
-    const likeCount = likeCounts[likeKey] || 0;
+    const likeCount = p.likeCount || 0;   // スプレッドシートの実数
     const likeLabel = isLiked ? '賛同済み ✓' : `🔥 賛同する`;
 
     const docBtn = p.petitionUrl
@@ -544,21 +547,39 @@ function escHtml(str) {
 }
 
 // =====================================================================
-// いいね（ローカルストレージで永続化）
+// いいね（ブラウザ記憶 + GAS経由でスプレッドシートに保存）
 // =====================================================================
-function addLike(id) {
+async function addLike(id) {
     const key = `petition_${id}`;
     if (likedSet.has(key)) return;
-    likedSet.add(key);
-    likeCounts[key] = (likeCounts[key] || 0) + 1;
-    localStorage.setItem('liked', JSON.stringify([...likedSet]));
-    localStorage.setItem('likeCounts', JSON.stringify(likeCounts));
 
+    const p = allPetitions.find(x => x.id === id);
+    if (!p) return;
+
+    // ブラウザに記録（ページをまたいで二重押し防止）
+    likedSet.add(key);
+    localStorage.setItem('liked', JSON.stringify([...likedSet]));
+
+    // UI を即時更新
     const btn = document.getElementById(`like-${id}`);
     if (btn) {
         btn.classList.add('clicked');
         btn.disabled = true;
-        btn.innerHTML = `<span>賛同済み ✓</span><span>${likeCounts[key].toLocaleString()}</span>`;
+        const newCount = (p.likeCount || 0) + 1;
+        btn.innerHTML = `<span>賛同済み ✓</span><span>${newCount.toLocaleString()}</span>`;
+    }
+
+    // GAS API に送信してスプレッドシートに保存
+    if (GAS_API_URL && GAS_API_URL !== 'YOUR_GAS_DEPLOY_URL_HERE') {
+        try {
+            // mode:'no-cors' でCORSを回避（レスポンスは読めないが書き込みは実行される）
+            await fetch(`${GAS_API_URL}?action=like&rowNum=${p.sheetRowNum}`, {
+                method: 'GET',
+                mode: 'no-cors'
+            });
+        } catch (err) {
+            console.warn('GAS API エラー（いいね記録）:', err);
+        }
     }
 }
 
