@@ -96,12 +96,29 @@
         .muni-panel { display: none; margin-top: 15px; background: #0a0a0a; border: 1px solid #333; border-radius: 6px; padding: 15px; text-align: left; }
         .muni-panel.open { display: block; }
         .muni-panel-title { font-size: 0.85rem; color: #666; margin-bottom: 10px; border-bottom: 1px solid #222; padding-bottom: 8px; }
-        .muni-item { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #111; flex-wrap: wrap; }
+        .muni-item { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #111; flex-wrap: wrap; cursor: pointer; transition: 0.2s; }
+        .muni-item:hover { background: #111; padding-left: 8px; border-radius: 4px; }
         .muni-item:last-child { border-bottom: none; }
-        .muni-name { font-weight: bold; min-width: 130px; font-size: 0.95rem; }
+        .muni-name { font-weight: bold; min-width: 130px; font-size: 0.95rem; color: #fff; }
+        .muni-name:hover { color: var(--accent-red); }
         .muni-stat { font-size: 0.75rem; padding: 3px 8px; background: #1a1a1a; border-radius: 20px; color: #888; }
         .muni-stat.active { color: #e6a000; border: 1px solid #e6a00055; }
         .muni-stat.sent { color: var(--accent-red); border: 1px solid var(--accent-red); background: #1a0000; }
+
+        /* ===== 陳情一覧パネル ===== */
+        .petition-list-panel { margin-top: 10px; background: #050505; border: 1px solid #2a2a2a; border-radius: 6px; padding: 12px; display: none; }
+        .petition-list-panel.open { display: block; }
+        .petition-list-title { font-size: 0.8rem; color: #555; margin-bottom: 8px; }
+        .petition-list-item { padding: 10px; border: 1px solid #1a1a1a; border-radius: 6px; margin-bottom: 8px; background: #0d0d0d; }
+        .petition-list-item:last-child { margin-bottom: 0; }
+        .petition-list-status { display: inline-block; font-size: 0.72rem; padding: 2px 8px; border-radius: 20px; margin-bottom: 6px; background: #1a1a1a; color: #888; }
+        .petition-list-status.sent { color: var(--accent-red); border: 1px solid var(--accent-red); background: #1a0000; }
+        .petition-list-status.generated { color: #e6a000; border: 1px solid #e6a00055; }
+        .petition-list-complaint { font-size: 0.85rem; color: #ccc; line-height: 1.5; margin-bottom: 6px; }
+        .petition-list-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
+        .petition-list-link { font-size: 0.8rem; color: var(--accent-red); text-decoration: none; }
+        .petition-list-link:hover { text-decoration: underline; }
+        .petition-list-likes { font-size: 0.78rem; color: #555; }
 
         /* ===== カード ===== */
         .petition-card { background: linear-gradient(145deg, #111, #1a1a1a); border: 1px solid #444; padding: 30px; border-radius: 8px; margin-bottom: 30px; position: relative; }
@@ -264,12 +281,13 @@
                 if (!r.prefecture || !r.municipality) return;
                 if (!prefMuniData[r.prefecture]) prefMuniData[r.prefecture] = {};
                 const m = r.municipality;
-                if (!prefMuniData[r.prefecture][m]) prefMuniData[r.prefecture][m] = { total: 0, generated: 0, sent: 0 };
+                if (!prefMuniData[r.prefecture][m]) prefMuniData[r.prefecture][m] = { total: 0, generated: 0, sent: 0, petitions: [] };
                 prefMuniData[r.prefecture][m].total++;
                 if (r.status && (r.status.includes('生成完了') || r.status.includes('送付準備') || r.status.includes('送付完了')))
                     prefMuniData[r.prefecture][m].generated++;
                 if (r.status && r.status.includes('送付完了'))
                     prefMuniData[r.prefecture][m].sent++;
+                prefMuniData[r.prefecture][m].petitions.push(r);
             });
         }
 
@@ -304,16 +322,69 @@
             } else {
                 const rows = Object.entries(munis)
                     .sort((a, b) => b[1].total - a[1].total)
-                    .map(([name, s]) => `
-                    <div class="muni-item">
-                        <span class="muni-name">${escHtml(name)}</span>
-                        <span class="muni-stat">📝 回答 ${s.total}件</span>
-                        <span class="muni-stat active">📄 生成 ${s.generated}件</span>
-                        <span class="muni-stat${s.sent > 0 ? ' sent' : ''}">🏛️ 送付 ${s.sent}件</span>
-                    </div>`).join('');
-                panel.innerHTML = `<div class="muni-panel-title">📍 ${escHtml(prefecture)} の自治体一覧</div>${rows}`;
+                    .map(([name, s]) => {
+                        const muniId = 'petlist-' + (prefecture + name).replace(/[^\w]/g, '_');
+                        return `
+                        <div class="muni-item" onclick="togglePetitionList('${escHtml(prefecture)}','${escHtml(name)}','${muniId}', this)">
+                            <span class="muni-name">▶ ${escHtml(name)}</span>
+                            <span class="muni-stat">📝 回答 ${s.total}件</span>
+                            <span class="muni-stat active">📄 生成 ${s.generated}件</span>
+                            <span class="muni-stat${s.sent > 0 ? ' sent' : ''}">🏛️ 送付 ${s.sent}件</span>
+                        </div>
+                        <div class="petition-list-panel" id="${muniId}"></div>`;
+                    }).join('');
+                panel.innerHTML = `<div class="muni-panel-title">📍 ${escHtml(prefecture)} の自治体一覧（クリックで陳情を表示）</div>${rows}`;
             }
             panel.classList.add('open');
+        }
+
+        // ===== 自治体の陳情一覧を表示/非表示 =====
+        function togglePetitionList(prefecture, municipality, panelId, item) {
+            const panel = document.getElementById(panelId);
+            const isOpen = panel.classList.contains('open');
+
+            // 同じ自治体を再クリックで閉じる
+            if (isOpen) {
+                panel.classList.remove('open');
+                item.querySelector('.muni-name').textContent = '▶ ' + municipality;
+                return;
+            }
+
+            item.querySelector('.muni-name').textContent = '▼ ' + municipality;
+
+            const petitions = (prefMuniData[prefecture][municipality] || {}).petitions || [];
+            if (petitions.length === 0) {
+                panel.innerHTML = '<p class="petition-list-title">陳情データがありません</p>';
+            } else {
+                panel.innerHTML = `<div class="petition-list-title">📋 ${escHtml(municipality)} の陳情一覧（${petitions.length}件）</div>` +
+                    petitions.map(p => {
+                        const statusClass = p.status.includes('送付完了') ? 'sent' :
+                                           (p.status.includes('生成完了') || p.status.includes('送付準備')) ? 'generated' : '';
+                        const statusLabel = getBadgeLabel(p.status) || p.status || '処理中';
+                        const link = p.petitionUrl
+                            ? `<a href="${escHtml(p.petitionUrl)}" target="_blank" class="petition-list-link">📄 陳情書を読む</a>`
+                            : `<span class="petition-list-link" style="color:#555;">陳情書生成中…</span>`;
+                        return `
+                        <div class="petition-list-item">
+                            <div><span class="petition-list-status ${statusClass}">${escHtml(statusLabel)}</span></div>
+                            <div class="petition-list-complaint">${p.complaint ? escHtml(p.complaint.slice(0, 120)) + '…' : '内容なし'}</div>
+                            <div class="petition-list-footer">
+                                ${link}
+                                <span class="petition-list-likes">🔥 賛同 ${(p.likeCount || 0).toLocaleString()}件</span>
+                            </div>
+                        </div>`;
+                    }).join('');
+            }
+            panel.classList.add('open');
+        }
+
+        function getBadgeLabel(status) {
+            if (!status) return '';
+            if (status.includes('改善') || status.includes('採択')) return '✅ 行政が対応';
+            if (status.includes('送付完了')) return '🏛️ 自治体へ送付完了';
+            if (status.includes('送付準備')) return '📮 送付準備中';
+            if (status.includes('生成完了')) return '📄 陳情書生成完了';
+            return status;
         }
 
         // ===== 実績バー更新 =====
