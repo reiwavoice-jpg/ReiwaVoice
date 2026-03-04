@@ -118,6 +118,7 @@
         footer a { color: #888; text-decoration: none; margin: 0 10px; }
         footer a:hover { color: #fff; }
 
+        @keyframes spin { to { transform: rotate(360deg); } }
         @media (max-width: 768px) {
             nav { display: none; flex-direction: column; position: absolute; top: 60px; left: 0; width: 100%; background: #000; padding: 20px; gap: 10px; border-bottom: 1px solid #333; }
             nav.open { display: flex; }
@@ -154,11 +155,11 @@
 
     <!-- 実績バー -->
     <div class="stats-bar">
-        <div class="stat-item"><div class="stat-value">47</div><div class="stat-label">生成された陳情書</div></div>
-        <div class="stat-item"><div class="stat-value">12</div><div class="stat-label">議会へ提出済み</div></div>
-        <div class="stat-item"><div class="stat-value">13,333</div><div class="stat-label">累計賛同数</div></div>
-        <div class="stat-item"><div class="stat-value">19</div><div class="stat-label">活動中の都道府県</div></div>
-        <div class="stat-item"><div class="stat-value">3</div><div class="stat-label">行政が対応・改善</div></div>
+        <div class="stat-item"><div class="stat-value" id="stat-petitions">－</div><div class="stat-label">生成された陳情書</div></div>
+        <div class="stat-item"><div class="stat-value" id="stat-submitted">－</div><div class="stat-label">自治体へ送付済み</div></div>
+        <div class="stat-item"><div class="stat-value" id="stat-likes">－</div><div class="stat-label">累計賛同数</div></div>
+        <div class="stat-item"><div class="stat-value" id="stat-prefectures">－</div><div class="stat-label">活動中の都道府県</div></div>
+        <div class="stat-item"><div class="stat-value" id="stat-improved">－</div><div class="stat-label">行政が対応・改善</div></div>
     </div>
 
     <div class="container">
@@ -189,17 +190,14 @@
         </div>
 
         <h2 class="section-title">🔥 進行中の追及プロジェクト</h2>
-        <div class="petition-card">
-            <div class="status-badge">議会提出準備中 / 賛同募集中</div>
-            <h3 style="color:#fff;">【東京都葛飾区】安全・安心のまちづくりの虚飾と民泊拡大への追及</h3>
-            <p style="color:#bbb;"><strong>■ 暴いた矛盾：</strong> 区はマスタープランで「安全な住環境」を約束しておきながら、決算データにおける防犯への予算投下を軽視している事実が発覚。</p>
-            <div class="action-area">
-                <span class="doc-link" onclick="openModal()">📄 陳情書全文（草案）を読む</span>
-                <button class="like-btn" id="like-btn-1" onclick="addLike()"><span>🔥 怒りの鉄槌を下す</span><span id="count-1">1,452</span></button>
+        <div id="project-cards">
+            <div style="text-align:center;padding:40px;color:#666;">
+                <div style="width:30px;height:30px;border:3px solid #333;border-top-color:#e60000;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 15px;"></div>
+                読み込み中…
             </div>
         </div>
 
-        <p style="text-align:center; margin-top: -10px;">
+        <p style="text-align:center; margin-top: 10px;">
             <a href="petitions.html" class="btn-primary" style="font-size:1rem; padding:12px 30px;">→ すべての陳情書一覧を見る</a>
         </p>
 
@@ -210,19 +208,6 @@
             <a href="form.html" class="btn-primary">🔥 今すぐ不満を投稿する</a>
         </div>
 
-    </div>
-
-    <!-- モーダル（陳情書全文） -->
-    <div class="modal-overlay" id="petition-modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal()">×</span>
-            <h3 style="color:var(--accent-red); border-bottom:1px solid #333; padding-bottom:10px;">東京都葛飾区議会 提出予定草案</h3>
-            <p><strong>【陳情趣旨】</strong><br>
-            葛飾区が掲げる「安全・安心のまちづくり」と、実際の予算執行における乖離を是正し、住居専用地域における民泊の制限および防犯パトロールの強化を求める。</p>
-            <p><strong>【陳情理由】</strong><br>
-            令和X年度決算データとAI解析の結果、防犯カメラ設置や見回りに対する予算配分が、マスタープランの目標値に対して不足していることが明白である。一方で、民泊等の観光インフラ拡充には偏った予算が投下されており、地域住民の不安を煽る結果となっている。現役世代の税金は、まず我々の生活の安全に還元されるべきである。</p>
-            <p style="margin-top:20px;"><a href="petitions.html" style="color:var(--accent-red);">→ すべての陳情書を見る</a></p>
-        </div>
     </div>
 
     <footer>
@@ -237,33 +222,149 @@
     </footer>
 
     <script>
-        function toggleNav() {
-            document.getElementById('main-nav').classList.toggle('open');
+        // ===== スプレッドシート設定 =====
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTCYqqRhudBfLXTNMov8_H4EPI4lWO5H-fYOsyq8W-nUnHmaIhrSFzshpiE21iARgxIUAOvai_kB38t/pub?gid=1710597455&single=true&output=csv';
+        const COL = { timestamp:0, prefecture:1, municipality:2, complaint:6, category:7, status:11, petitionUrl:12, likeCount:14 };
+
+        // ===== データ読み込み =====
+        async function loadIndexData() {
+            try {
+                const res = await fetch(SHEET_URL);
+                if (!res.ok) throw new Error();
+                const data = rowsToObjects(parseCSV(await res.text()));
+                updateStats(data);
+                updatePrefMap(data);
+                updateProjects(data);
+            } catch(e) {
+                document.getElementById('project-cards').innerHTML =
+                    '<p style="color:#666;text-align:center;">データを読み込めませんでした</p>';
+            }
         }
 
+        // ===== 実績バー更新 =====
+        function updateStats(data) {
+            const total     = data.filter(r => r.petitionUrl || r.complaint).length;
+            const submitted = data.filter(r => r.status && (r.status.includes('送付完了') || r.status.includes('送付準備'))).length;
+            const likes     = data.reduce((s, r) => s + (r.likeCount || 0), 0);
+            const prefs     = new Set(data.map(r => r.prefecture).filter(Boolean)).size;
+            const improved  = data.filter(r => r.status && (r.status.includes('改善') || r.status.includes('対応') || r.status.includes('採択'))).length;
+            setText('stat-petitions',  total);
+            setText('stat-submitted',  submitted);
+            setText('stat-likes',      likes.toLocaleString());
+            setText('stat-prefectures',prefs);
+            setText('stat-improved',   improved);
+        }
+        function setText(id, val) { const el = document.getElementById(id); if(el) el.textContent = val; }
+
+        // ===== 都道府県マップ更新 =====
+        function updatePrefMap(data) {
+            // 都道府県ごとに最新ステータスを取得
+            const prefMap = {};
+            data.forEach(r => {
+                if (!r.prefecture) return;
+                if (!prefMap[r.prefecture]) prefMap[r.prefecture] = { status: '', count: 0 };
+                prefMap[r.prefecture].count++;
+                if (r.status) prefMap[r.prefecture].status = r.status;
+            });
+
+            document.querySelectorAll('.pref-tag').forEach(tag => {
+                const baseName = tag.textContent.trim().replace(/（.*）/, '');
+                const match = Object.keys(prefMap).find(p => baseName.startsWith(p) || p.startsWith(baseName));
+                if (match) {
+                    tag.classList.add('target');
+                    const emoji = getStatusEmoji(prefMap[match].status);
+                    tag.textContent = `${match}${emoji ? '（' + emoji + '）' : ''}`;
+                }
+            });
+        }
+        function getStatusEmoji(status) {
+            if (!status) return '';
+            if (status.includes('送付完了')) return '🏛️送付完了';
+            if (status.includes('送付準備')) return '📮送付準備中';
+            if (status.includes('生成完了')) return '📄生成完了';
+            if (status.includes('承認'))    return '⚙️処理中';
+            return '';
+        }
+
+        // ===== 進行中プロジェクト更新 =====
+        function updateProjects(data) {
+            const active = data
+                .filter(r => r.status && r.status !== '' && (r.complaint || r.petitionUrl))
+                .sort((a, b) => (b.likeCount || 0) - (a.likeCount || 0))
+                .slice(0, 3);
+
+            if (active.length === 0) {
+                document.getElementById('project-cards').innerHTML =
+                    '<p style="color:#666;text-align:center;padding:30px;">まだ進行中のプロジェクトはありません</p>';
+                return;
+            }
+
+            document.getElementById('project-cards').innerHTML = active.map(r => {
+                const loc  = [r.prefecture, r.municipality].filter(Boolean).join(' ');
+                const cat  = r.category ? `【${escHtml(r.category)}】` : '';
+                const badge = getStatusBadge(r.status);
+                const likes = r.likeCount || 0;
+                const link  = r.petitionUrl
+                    ? `<a href="${escHtml(r.petitionUrl)}" target="_blank" class="doc-link">📄 陳情書全文を読む</a>`
+                    : `<span style="color:#555;">陳情書生成中…</span>`;
+                return `
+                <div class="petition-card">
+                    <div class="status-badge">${badge}</div>
+                    <h3 style="color:#fff;">【${escHtml(loc)}】${cat}への追及</h3>
+                    <p style="color:#bbb;">${r.complaint ? escHtml(r.complaint.slice(0, 100)) + '…' : ''}</p>
+                    <div class="action-area">
+                        ${link}
+                        <button class="like-btn" disabled>
+                            <span>🔥 賛同数</span><span>${likes.toLocaleString()}</span>
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+        function getStatusBadge(status) {
+            if (!status) return '処理中';
+            if (status.includes('送付完了')) return '🏛️ 自治体へ送付完了';
+            if (status.includes('送付準備')) return '📮 送付準備中 / 賛同募集中';
+            if (status.includes('生成完了')) return '📄 陳情書生成完了 / 賛同募集中';
+            if (status.includes('改善') || status.includes('採択')) return '✅ 行政が対応';
+            return status;
+        }
+
+        // ===== CSV パーサー =====
+        function parseCSV(text) {
+            const rows = []; let row = [], field = '', inQ = false;
+            for (let i = 0; i < text.length; i++) {
+                const ch = text[i], nx = text[i+1];
+                if (inQ) { if (ch==='"'&&nx==='"'){field+='"';i++;} else if(ch==='"'){inQ=false;} else{field+=ch;} }
+                else { if(ch==='"'){inQ=true;} else if(ch===','){row.push(field);field='';} else if(ch==='\n'||(ch==='\r'&&nx==='\n')){if(ch==='\r')i++;row.push(field);rows.push(row);row=[];field='';} else{field+=ch;} }
+            }
+            if (field!==''||row.length>0){row.push(field);rows.push(row);}
+            return rows;
+        }
+        function rowsToObjects(rows) {
+            if (!rows||rows.length<2) return [];
+            return rows.slice(1).map((c,i)=>{
+                const g=j=>(c[j]!==undefined?c[j].trim():'');
+                return { id:i, prefecture:g(COL.prefecture), municipality:g(COL.municipality),
+                    complaint:g(COL.complaint), category:g(COL.category),
+                    status:g(COL.status), petitionUrl:g(COL.petitionUrl),
+                    likeCount:parseInt(g(COL.likeCount))||0 };
+            }).filter(p=>p.prefecture&&p.prefecture!=='Q1. お住まいの都道府県を選択してください');
+        }
+        function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+        // ===== ナビ / マップ =====
+        function toggleNav() { document.getElementById('main-nav').classList.toggle('open'); }
         function toggleRegion(regionId, e) {
             const panel = document.getElementById(regionId + '-panel');
             const isOpen = panel.style.display === 'block';
             document.querySelectorAll('.prefecture-panel').forEach(p => p.style.display = 'none');
             document.querySelectorAll('.region-btn').forEach(b => b.classList.remove('active'));
-            if (!isOpen) {
-                panel.style.display = 'block';
-                e.target.classList.add('active');
-            }
+            if (!isOpen) { panel.style.display = 'block'; e.target.classList.add('active'); }
         }
 
-        function openModal() { document.getElementById('petition-modal').style.display = 'flex'; }
-        function closeModal() { document.getElementById('petition-modal').style.display = 'none'; }
-
-        let isClicked = false;
-        function addLike() {
-            if (isClicked) return;
-            let currentCount = parseInt(document.getElementById('count-1').innerText.replace(',', ''));
-            document.getElementById('count-1').innerText = (currentCount + 1).toLocaleString();
-            document.getElementById('like-btn-1').classList.add('clicked');
-            document.getElementById('like-btn-1').innerHTML = `<span>🔥 賛同完了！</span> <span>${(currentCount + 1).toLocaleString()}</span>`;
-            isClicked = true;
-        }
+        // ===== 初回ロード =====
+        loadIndexData();
     </script>
 </body>
 </html>
