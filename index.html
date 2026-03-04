@@ -254,7 +254,7 @@
     <script>
         // ===== スプレッドシート設定 =====
         const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQpmRYjyz365eM2kyhPenekUNsQSNF_0o7tDnBve_K7djXMs7WQocFWhjLSfysuFdY3Bp0tKhh0tK2y/pub?gid=2064671577&single=true&output=csv';
-        const COL = { timestamp:0, prefecture:1, municipality:2, complaint:6, category:7, status:11, petitionUrl:12, likeCount:14 };
+        const COL = { timestamp:0, prefecture:1, municipality:2, complaint:6, category:7, status:11, petitionUrl:12, likeCount:14, title:15 };
 
         // ===== データ読み込み =====
         let prefMuniData = {}; // 都道府県 → 自治体 → 統計
@@ -367,7 +367,7 @@
                         return `
                         <div class="petition-list-item">
                             <div><span class="petition-list-status ${statusClass}">${escHtml(statusLabel)}</span></div>
-                            <div class="petition-list-complaint">${p.complaint ? escHtml(p.complaint.slice(0, 120)) + '…' : '内容なし'}</div>
+                            <div class="petition-list-complaint">${p.title ? escHtml(p.title) : (p.complaint ? '【' + escHtml(p.category || '行政問題') + '】に関する陳情' : '内容確認中')}</div>
                             <div class="petition-list-footer">
                                 ${link}
                                 <span class="petition-list-likes">🔥 賛同 ${(p.likeCount || 0).toLocaleString()}件</span>
@@ -497,7 +497,8 @@
                 return { id:i, prefecture:g(COL.prefecture), municipality:g(COL.municipality),
                     complaint:g(COL.complaint), category:g(COL.category),
                     status:g(COL.status), petitionUrl:g(COL.petitionUrl),
-                    likeCount:parseInt(g(COL.likeCount))||0 };
+                    likeCount:parseInt(g(COL.likeCount))||0,
+                    title:g(COL.title) };
             }).filter(p=>p.prefecture&&p.prefecture!=='Q1. お住まいの都道府県を選択してください');
         }
         function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}

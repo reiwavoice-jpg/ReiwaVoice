@@ -312,7 +312,8 @@ const COL = {
     status       : 11,  // ステータス
     petitionUrl  : 12,  // 生成された陳情書URL
     // 13: 送信メールステータス（非表示）
-    likeCount    : 14,  // O列: 賛同数（スプレッドシートに追加が必要）
+    likeCount    : 14,  // O列: 賛同数
+    title        : 15,  // P列: AIタイトル（個人情報なし）
 };
 
 // =====================================================================
@@ -399,6 +400,7 @@ function rowsToObjects(rows) {
                 status      : get(COL.status),
                 petitionUrl : get(COL.petitionUrl),
                 likeCount   : parseInt(get(COL.likeCount)) || 0,  // O列: 賛同数
+                title       : get(COL.title),                     // P列: AIタイトル
             };
         })
         .filter(p =>
@@ -482,9 +484,10 @@ function buildCard(p) {
     const statusClass = getStatusClass(p.status);
     const statusLabel = p.status || '処理中';
     const title       = buildTitle(p);
-    const summary     = p.complaint
-        ? (p.complaint.length > 150 ? p.complaint.slice(0, 150) + '…' : p.complaint)
-        : '（陳情書が生成されました）';
+    // AIタイトルがあればそれを表示、なければカテゴリベースの汎用表現にする（生の不満テキストは非表示）
+    const summary     = p.title
+        ? p.title
+        : (p.category ? `【${p.category}】に関する市民の声` : '行政への陳情');
 
     const likeKey   = `petition_${p.id}`;
     const isLiked   = likedSet.has(likeKey);
