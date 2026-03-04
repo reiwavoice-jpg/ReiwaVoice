@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>陳情書一覧 | 令和ボイス</title>
+    <style>
+        :root {
+            --main-bg: #0d0d0d;
+            --text-color: #f2f2f2;
+            --accent-red: #e60000;
+            --accent-dark-red: #990000;
+            --card-bg: #1a1a1a;
+            --border-color: #333;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+            background-color: var(--main-bg);
+            color: var(--text-color);
+            line-height: 1.8;
+        }
+
+        /* ===== ナビゲーション ===== */
+        header {
+            background-color: #000; padding: 0 5%;
+            border-bottom: 2px solid var(--accent-red);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .header-inner { display: flex; justify-content: space-between; align-items: center; height: 60px; }
+        .site-logo { font-size: 1.5rem; font-weight: bold; letter-spacing: 2px; color: #fff; text-decoration: none; }
+        nav { display: flex; align-items: center; gap: 5px; }
+        nav a { color: #ccc; text-decoration: none; padding: 8px 14px; border-radius: 4px; font-size: 0.9rem; transition: 0.2s; }
+        nav a:hover { color: #fff; background: #1a1a1a; }
+        nav a.active { color: var(--accent-red); border-bottom: 2px solid var(--accent-red); border-radius: 0; }
+        .nav-cta { background: var(--accent-red) !important; color: #fff !important; font-weight: bold; border-radius: 4px !important; border-bottom: none !important; }
+        .nav-cta:hover { background: var(--accent-dark-red) !important; }
+        .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 5px; }
+        .hamburger span { display: block; width: 22px; height: 2px; background: #fff; }
+
+        /* ===== ページヘッダー ===== */
+        .page-hero {
+            padding: 60px 10%; text-align: center;
+            background: linear-gradient(to bottom, #1a0000, #0d0d0d);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .page-hero h1 { font-size: 2.5rem; color: var(--accent-red); margin-bottom: 10px; }
+        .page-hero p { color: #aaa; font-size: 1.1rem; }
+
+        .container { max-width: 960px; margin: 0 auto; padding: 50px 20px; }
+
+        /* ===== フィルターバー ===== */
+        .filter-bar {
+            display: flex; flex-wrap: wrap; gap: 10px;
+            align-items: center; margin-bottom: 25px;
+            padding: 20px; background: var(--card-bg);
+            border: 1px solid var(--border-color); border-radius: 8px;
+        }
+        .filter-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; width: 100%; }
+        .filter-label { color: #888; font-size: 0.82rem; min-width: 55px; }
+        .filter-btn {
+            background: #222; color: #ccc; border: 1px solid #444;
+            padding: 6px 14px; border-radius: 20px; cursor: pointer;
+            font-size: 0.82rem; transition: 0.2s;
+        }
+        .filter-btn.active, .filter-btn:hover { background: var(--accent-red); color: #fff; border-color: var(--accent-red); }
+        .search-box {
+            flex: 1; min-width: 200px;
+            background: #111; border: 1px solid #444; color: #fff;
+            padding: 8px 15px; border-radius: 20px; font-size: 0.9rem; outline: none;
+        }
+        .search-box:focus { border-color: var(--accent-red); }
+        .category-select {
+            background: #222; color: #ccc; border: 1px solid #444;
+            padding: 7px 12px; border-radius: 20px; font-size: 0.82rem;
+            cursor: pointer; outline: none;
+        }
+        .category-select:focus { border-color: var(--accent-red); }
+
+        /* ===== 件数表示 ===== */
+        .list-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .list-meta .count { color: #888; font-size: 0.9rem; }
+        .list-meta .count span { color: var(--accent-red); font-weight: bold; font-size: 1.1rem; }
+        .reload-btn {
+            background: transparent; border: 1px solid #444;
+            color: #888; padding: 6px 14px; border-radius: 20px;
+            cursor: pointer; font-size: 0.82rem; transition: 0.2s;
+        }
+        .reload-btn:hover { border-color: var(--accent-red); color: var(--accent-red); }
+
+        /* ===== ローディング ===== */
+        .loading-state {
+            text-align: center; padding: 80px 20px;
+        }
+        .spinner {
+            width: 40px; height: 40px; border: 3px solid #333;
+            border-top-color: var(--accent-red); border-radius: 50%;
+            animation: spin 0.8s linear infinite; margin: 0 auto 20px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-state p { color: #666; }
+
+        /* ===== エラー・空状態 ===== */
+        .error-state, .empty-state {
+            text-align: center; padding: 60px 20px;
+            background: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+        .error-state .icon, .empty-state .icon { font-size: 3rem; margin-bottom: 15px; }
+        .error-state h3, .empty-state h3 { color: #fff; margin: 0 0 10px; }
+        .error-state p, .empty-state p { color: #888; margin: 0 0 20px; font-size: 0.9rem; }
+        .error-detail {
+            background: #111; border: 1px solid #444; border-radius: 6px;
+            padding: 15px; margin: 15px 0; font-size: 0.8rem; color: #888;
+            text-align: left; line-height: 1.6;
+        }
+
+        /* ===== 陳情書カード ===== */
+        .petition-list { display: flex; flex-direction: column; gap: 20px; }
+        .petition-card {
+            background: var(--card-bg); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 25px 30px;
+            position: relative; transition: border-color 0.2s;
+        }
+        .petition-card:hover { border-color: #555; }
+        .card-top { display: flex; gap: 8px; align-items: flex-start; flex-wrap: wrap; margin-bottom: 12px; }
+        .status-badge {
+            display: inline-block; padding: 4px 12px;
+            font-size: 0.78rem; font-weight: bold; border-radius: 20px;
+        }
+        .status-受付中   { background: #1a1a00; color: #e6c000; border: 1px solid #e6c000; }
+        .status-募集中   { background: #1a1a00; color: #e6c000; border: 1px solid #e6c000; }
+        .status-準備中   { background: #2a0000; color: var(--accent-red); border: 1px solid var(--accent-red); }
+        .status-提出済み { background: #001a00; color: #00c44f; border: 1px solid #00c44f; }
+        .status-提出済   { background: #001a00; color: #00c44f; border: 1px solid #00c44f; }
+        .status-審議中   { background: #001a2a; color: #00aaff; border: 1px solid #00aaff; }
+        .status-default  { background: #222; color: #aaa; border: 1px solid #444; }
+        .pref-badge { display: inline-block; background: #222; color: #ccc; padding: 4px 12px; font-size: 0.78rem; border-radius: 20px; border: 1px solid #444; }
+        .category-badge { display: inline-block; background: #1a1a2a; color: #8888ff; padding: 4px 12px; font-size: 0.78rem; border-radius: 20px; border: 1px solid #4444aa; }
+        .petition-card h3 { margin: 0 0 10px; font-size: 1.1rem; color: #fff; }
+        .petition-summary { color: #bbb; font-size: 0.9rem; margin-bottom: 15px; line-height: 1.7; }
+        .card-bottom {
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 10px;
+            border-top: 1px dashed #333; padding-top: 15px; margin-top: 5px;
+        }
+        .card-meta { display: flex; gap: 15px; color: #666; font-size: 0.82rem; flex-wrap: wrap; }
+        .petition-doc-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: transparent; border: 1px solid #555;
+            color: #ccc; padding: 8px 18px; border-radius: 20px;
+            text-decoration: none; font-size: 0.85rem; transition: 0.2s;
+            cursor: pointer;
+        }
+        .petition-doc-btn:hover { border-color: var(--accent-red); color: var(--accent-red); }
+        .like-btn {
+            background: transparent; border: 2px solid var(--accent-red);
+            color: var(--accent-red); padding: 8px 20px; font-size: 1rem;
+            font-weight: bold; border-radius: 50px; cursor: pointer;
+            display: flex; align-items: center; gap: 8px; transition: 0.2s;
+        }
+        .like-btn:hover, .like-btn.clicked { background: var(--accent-red); color: #fff; }
+        .like-btn.clicked { cursor: default; }
+
+        /* ===== ページネーション ===== */
+        .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 40px; flex-wrap: wrap; }
+        .page-btn {
+            background: #222; color: #ccc; border: 1px solid #444;
+            padding: 8px 16px; border-radius: 4px; cursor: pointer;
+            font-size: 0.9rem; transition: 0.2s; min-width: 40px;
+        }
+        .page-btn.active, .page-btn:hover { background: var(--accent-red); color: #fff; border-color: var(--accent-red); }
+        .page-btn:disabled { opacity: 0.4; cursor: default; }
+        .page-btn:disabled:hover { background: #222; color: #ccc; border-color: #444; }
+
+        /* ===== 注意バナー ===== */
+        .publish-notice {
+            background: #1a1500; border: 1px solid #554400;
+            border-radius: 8px; padding: 15px 20px;
+            margin-bottom: 20px; font-size: 0.85rem; color: #ccaa00;
+            display: none;
+        }
+        .publish-notice strong { color: #ffcc00; }
+
+        footer {
+            background: #000; border-top: 1px solid var(--border-color);
+            text-align: center; padding: 30px 20px;
+            color: #555; font-size: 0.85rem; margin-top: 80px;
+        }
+        footer a { color: #888; text-decoration: none; margin: 0 10px; }
+        footer a:hover { color: #fff; }
+
+        @media (max-width: 768px) {
+            nav { display: none; flex-direction: column; position: absolute; top: 60px; left: 0; width: 100%; background: #000; padding: 20px; gap: 10px; border-bottom: 1px solid var(--border-color); }
+            nav.open { display: flex; }
+            .hamburger { display: flex; }
+            .page-hero h1 { font-size: 1.8rem; }
+            .petition-card { padding: 18px; }
+            .card-meta { flex-direction: column; gap: 4px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-inner">
+        <a href="index.html" class="site-logo">令和ボイス</a>
+        <nav id="main-nav">
+            <a href="about.html">使い方</a>
+            <a href="form.html">不満を投稿</a>
+            <a href="petitions.html" class="active">陳情書一覧</a>
+            <a href="results.html">活動実績</a>
+            <a href="form.html" class="nav-cta">今すぐ声を上げる</a>
+        </nav>
+        <div class="hamburger" onclick="toggleNav()"><span></span><span></span><span></span></div>
+    </div>
+</header>
+
+<div class="page-hero">
+    <h1>陳情書一覧</h1>
+    <p>全国から集まった市民の声。賛同して、議会への圧力を高めよう。</p>
+</div>
+
+<div class="container">
+
+    <!-- データ取得エラー時に表示 -->
+    <div class="publish-notice" id="publish-notice">
+        ⚠️ データの読み込みに失敗しました。ネットワーク接続を確認するか、ページを再読み込みしてください。
+    </div>
+
+    <!-- フィルターバー -->
+    <div class="filter-bar">
+        <div class="filter-row">
+            <span class="filter-label">ステータス</span>
+            <button class="filter-btn active" onclick="setStatusFilter('all', this)">すべて</button>
+            <button class="filter-btn" onclick="setStatusFilter('募集中', this)">🔥 賛同募集中</button>
+            <button class="filter-btn" onclick="setStatusFilter('準備中', this)">📋 提出準備中</button>
+            <button class="filter-btn" onclick="setStatusFilter('提出済', this)">✅ 提出済み</button>
+            <button class="filter-btn" onclick="setStatusFilter('審議中', this)">🏛️ 審議中</button>
+        </div>
+        <div class="filter-row">
+            <span class="filter-label">都道府県</span>
+            <select class="category-select" id="pref-select" onchange="setPrefFilter(this.value)">
+                <option value="all">すべての都道府県</option>
+            </select>
+            <span class="filter-label" style="margin-left:10px;">カテゴリ</span>
+            <select class="category-select" id="category-select" onchange="setCategoryFilter(this.value)">
+                <option value="all">すべてのカテゴリ</option>
+            </select>
+        </div>
+        <div class="filter-row">
+            <input type="text" class="search-box" id="search-input"
+                placeholder="🔍 キーワードで絞り込む（市区町村・不満内容など）"
+                oninput="setKeywordFilter(this.value)">
+        </div>
+    </div>
+
+    <div class="list-meta">
+        <div class="count"><span id="shown-count">－</span> 件の陳情書</div>
+        <button class="reload-btn" onclick="loadData()">🔄 最新データを取得</button>
+    </div>
+
+    <!-- 陳情書リスト（動的生成） -->
+    <div id="petition-list">
+        <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Googleスプレッドシートからデータを読み込んでいます…</p>
+        </div>
+    </div>
+
+    <div id="pagination" class="pagination"></div>
+
+</div>
+
+<footer>
+    <p>© 2025 令和ボイス All Rights Reserved.</p>
+    <p>
+        <a href="index.html">トップ</a>
+        <a href="about.html">使い方</a>
+        <a href="form.html">不満を投稿</a>
+        <a href="petitions.html">陳情書一覧</a>
+        <a href="results.html">活動実績</a>
+    </p>
+</footer>
+
+<script>
+// =====================================================================
+// 設定
+// =====================================================================
+// ▼ Googleスプレッドシート「ウェブに公開」で発行したCSV URL
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTCYqqRhudBfLXTNMov8_H4EPI4lWO5H-fYOsyq8W-nUnHmaIhrSFzshpiE21iARgxIUAOvai_kB38t/pub?gid=1710597455&single=true&output=csv';
+
+const PER_PAGE  = 10; // 1ページあたりの表示件数
+
+// 列インデックス（0始まり） ← スプレッドシートの列構成に基づく
+const COL = {
+    timestamp    : 0,
+    prefecture   : 1,   // Q1 都道府県
+    municipality : 2,   // Q2 市区町村
+    ageGroup     : 3,   // Q3-1 年代
+    gender       : 4,   // Q3-2 性別
+    occupation   : 5,   // Q3-3 職業（任意）
+    complaint    : 6,   // Q4 不満内容
+    category     : 7,   // Q5 カテゴリ
+    // 8: Q6 業務妨害禁止（非表示）
+    // 9: Q7 ヒューマンチェック（非表示）
+    // 10: Q8 メール（非表示）
+    status       : 11,  // ステータス
+    petitionUrl  : 12,  // 生成された陳情書URL
+    emailStatus  : 13   // 送信メールステータス（非表示）
+};
+
+// =====================================================================
+// 状態管理
+// =====================================================================
+let allPetitions    = [];   // 全データ
+let filteredData    = [];   // フィルタ後データ
+let currentPage     = 1;
+let likedSet        = new Set(JSON.parse(localStorage.getItem('liked') || '[]'));
+let likeCounts      = JSON.parse(localStorage.getItem('likeCounts') || '{}');
+let activeFilters   = { status: 'all', prefecture: 'all', category: 'all', keyword: '' };
+
+// =====================================================================
+// データ取得（CSV版）
+// =====================================================================
+async function loadData() {
+    document.getElementById('petition-list').innerHTML = `
+        <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Googleスプレッドシートからデータを読み込んでいます…</p>
+        </div>`;
+    document.getElementById('pagination').innerHTML = '';
+    document.getElementById('shown-count').textContent = '－';
+    document.getElementById('publish-notice').style.display = 'none';
+
+    try {
+        const res = await fetch(SHEET_URL);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const text = await res.text();
+
+        const rows = parseCSV(text);
+        allPetitions = rowsToObjects(rows);
+        populateFilterSelects();
+        applyFilters();
+
+    } catch (err) {
+        console.error(err);
+        showError(err.message);
+    }
+}
+
+// =====================================================================
+// CSVパーサー（ダブルクォート・改行・カンマ含む値に対応）
+// =====================================================================
+function parseCSV(text) {
+    const rows = [];
+    let row = [], field = '', inQuotes = false;
+
+    for (let i = 0; i < text.length; i++) {
+        const ch = text[i], next = text[i + 1];
+        if (inQuotes) {
+            if (ch === '"' && next === '"') { field += '"'; i++; }
+            else if (ch === '"')            { inQuotes = false; }
+            else                            { field += ch; }
+        } else {
+            if      (ch === '"')                         { inQuotes = true; }
+            else if (ch === ',')                         { row.push(field); field = ''; }
+            else if (ch === '\n' || (ch === '\r' && next === '\n')) {
+                if (ch === '\r') i++;
+                row.push(field); rows.push(row); row = []; field = '';
+            } else { field += ch; }
+        }
+    }
+    if (field !== '' || row.length > 0) { row.push(field); rows.push(row); }
+    return rows;
+}
+
+// =====================================================================
+// CSV行配列 → オブジェクト配列（ヘッダー行をスキップ）
+// =====================================================================
+function rowsToObjects(rows) {
+    if (!rows || rows.length < 2) return [];
+
+    // 1行目はヘッダーなのでスキップ（index 1〜）
+    return rows.slice(1)
+        .map((cols, idx) => {
+            const get = (i) => (cols[i] !== undefined ? cols[i].trim() : '');
+            return {
+                id          : idx,
+                timestamp   : get(COL.timestamp),
+                prefecture  : get(COL.prefecture),
+                municipality: get(COL.municipality),
+                complaint   : get(COL.complaint),
+                category    : get(COL.category),
+                status      : get(COL.status),
+                petitionUrl : get(COL.petitionUrl),
+            };
+        })
+        .filter(p =>
+            // 空行 & ヘッダー文字列の混入を除外
+            p.prefecture
+            && p.prefecture !== 'Q1. お住まいの都道府県を選択してください'
+            && (p.complaint || p.petitionUrl)
+        );
+}
+
+// =====================================================================
+// フィルター用セレクトボックスを動的生成
+// =====================================================================
+function populateFilterSelects() {
+    const prefs      = [...new Set(allPetitions.map(p => p.prefecture).filter(Boolean))].sort();
+    const categories = [...new Set(allPetitions.map(p => p.category).filter(Boolean))].sort();
+
+    const prefSel = document.getElementById('pref-select');
+    prefSel.innerHTML = '<option value="all">すべての都道府県</option>';
+    prefs.forEach(p => prefSel.innerHTML += `<option value="${p}">${p}</option>`);
+
+    const catSel = document.getElementById('category-select');
+    catSel.innerHTML = '<option value="all">すべてのカテゴリ</option>';
+    categories.forEach(c => catSel.innerHTML += `<option value="${c}">${c}</option>`);
+}
+
+// =====================================================================
+// フィルタ適用
+// =====================================================================
+function applyFilters() {
+    filteredData = allPetitions.filter(p => {
+        const matchStatus = activeFilters.status === 'all'
+            || (p.status && p.status.includes(activeFilters.status));
+
+        const matchPref = activeFilters.prefecture === 'all'
+            || p.prefecture === activeFilters.prefecture;
+
+        const matchCat = activeFilters.category === 'all'
+            || p.category === activeFilters.category;
+
+        const kw = activeFilters.keyword.toLowerCase();
+        const matchKw = !kw
+            || p.complaint.toLowerCase().includes(kw)
+            || p.municipality.toLowerCase().includes(kw)
+            || p.prefecture.toLowerCase().includes(kw)
+            || p.category.toLowerCase().includes(kw);
+
+        return matchStatus && matchPref && matchCat && matchKw;
+    });
+
+    currentPage = 1;
+    document.getElementById('shown-count').textContent = filteredData.length;
+    renderPage(currentPage);
+    renderPagination();
+}
+
+// =====================================================================
+// ページレンダリング
+// =====================================================================
+function renderPage(page) {
+    const list  = document.getElementById('petition-list');
+    const start = (page - 1) * PER_PAGE;
+    const slice = filteredData.slice(start, start + PER_PAGE);
+
+    if (slice.length === 0) {
+        list.innerHTML = `
+            <div class="empty-state">
+                <div class="icon">🔍</div>
+                <h3>該当する陳情書がありません</h3>
+                <p>フィルターを変えるか、別のキーワードで検索してみてください。</p>
+            </div>`;
+        return;
+    }
+
+    list.innerHTML = slice.map(p => buildCard(p)).join('');
+}
+
+// =====================================================================
+// カード HTML 生成
+// =====================================================================
+function buildCard(p) {
+    const statusClass = getStatusClass(p.status);
+    const statusLabel = p.status || '処理中';
+    const title       = buildTitle(p);
+    const summary     = p.complaint
+        ? (p.complaint.length > 150 ? p.complaint.slice(0, 150) + '…' : p.complaint)
+        : '（陳情書が生成されました）';
+
+    const likeKey   = `petition_${p.id}`;
+    const isLiked   = likedSet.has(likeKey);
+    const likeCount = likeCounts[likeKey] || 0;
+    const likeLabel = isLiked ? '賛同済み ✓' : `🔥 賛同する`;
+
+    const docBtn = p.petitionUrl
+        ? `<a href="${escHtml(p.petitionUrl)}" target="_blank" rel="noopener" class="petition-doc-btn">📄 陳情書全文を読む</a>`
+        : `<span class="petition-doc-btn" style="opacity:0.4;cursor:default;">📄 生成中…</span>`;
+
+    return `
+    <div class="petition-card" id="card-${p.id}">
+        <div class="card-top">
+            <span class="status-badge ${statusClass}">${statusLabel}</span>
+            <span class="pref-badge">📍 ${escHtml(p.prefecture)}${p.municipality ? ' ' + escHtml(p.municipality) : ''}</span>
+            ${p.category ? `<span class="category-badge">${escHtml(p.category)}</span>` : ''}
+        </div>
+        <h3>${escHtml(title)}</h3>
+        <p class="petition-summary">${escHtml(summary)}</p>
+        <div class="card-bottom">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                ${docBtn}
+                ${p.timestamp ? `<span class="card-meta">📅 ${escHtml(p.timestamp)}</span>` : ''}
+            </div>
+            <button class="like-btn ${isLiked ? 'clicked' : ''}"
+                    id="like-${p.id}"
+                    onclick="addLike(${p.id})"
+                    ${isLiked ? 'disabled' : ''}>
+                <span>${likeLabel}</span>
+                ${likeCount > 0 ? `<span>${likeCount.toLocaleString()}</span>` : ''}
+            </button>
+        </div>
+    </div>`;
+}
+
+// =====================================================================
+// ユーティリティ
+// =====================================================================
+function buildTitle(p) {
+    const loc = [p.prefecture, p.municipality].filter(Boolean).join(' ');
+    const cat = p.category || '行政への追及';
+    return `【${loc}】${cat}`;
+}
+
+function getStatusClass(status) {
+    if (!status) return 'status-default';
+    if (status.includes('受付') || status.includes('募集')) return 'status-募集中';
+    if (status.includes('準備'))  return 'status-準備中';
+    if (status.includes('提出'))  return 'status-提出済';
+    if (status.includes('審議'))  return 'status-審議中';
+    return 'status-default';
+}
+
+function escHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+// =====================================================================
+// いいね（ローカルストレージで永続化）
+// =====================================================================
+function addLike(id) {
+    const key = `petition_${id}`;
+    if (likedSet.has(key)) return;
+    likedSet.add(key);
+    likeCounts[key] = (likeCounts[key] || 0) + 1;
+    localStorage.setItem('liked', JSON.stringify([...likedSet]));
+    localStorage.setItem('likeCounts', JSON.stringify(likeCounts));
+
+    const btn = document.getElementById(`like-${id}`);
+    if (btn) {
+        btn.classList.add('clicked');
+        btn.disabled = true;
+        btn.innerHTML = `<span>賛同済み ✓</span><span>${likeCounts[key].toLocaleString()}</span>`;
+    }
+}
+
+// =====================================================================
+// ページネーション
+// =====================================================================
+function renderPagination() {
+    const totalPages = Math.ceil(filteredData.length / PER_PAGE);
+    const pg = document.getElementById('pagination');
+    if (totalPages <= 1) { pg.innerHTML = ''; return; }
+
+    let html = `<button class="page-btn" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>← 前へ</button>`;
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || Math.abs(i - currentPage) <= 2) {
+            html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goPage(${i})">${i}</button>`;
+        } else if (Math.abs(i - currentPage) === 3) {
+            html += `<span style="color:#555;padding:8px 4px;">…</span>`;
+        }
+    }
+    html += `<button class="page-btn" onclick="goPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>次へ →</button>`;
+    pg.innerHTML = html;
+}
+
+function goPage(page) {
+    const totalPages = Math.ceil(filteredData.length / PER_PAGE);
+    if (page < 1 || page > totalPages) return;
+    currentPage = page;
+    renderPage(page);
+    renderPagination();
+    window.scrollTo({ top: document.querySelector('.container').offsetTop - 80, behavior: 'smooth' });
+}
+
+// =====================================================================
+// フィルター操作
+// =====================================================================
+function setStatusFilter(val, btn) {
+    activeFilters.status = val;
+    document.querySelectorAll('.filter-row:first-child .filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilters();
+}
+function setPrefFilter(val)      { activeFilters.prefecture = val; applyFilters(); }
+function setCategoryFilter(val)  { activeFilters.category   = val; applyFilters(); }
+function setKeywordFilter(val)   { activeFilters.keyword    = val; applyFilters(); }
+
+// =====================================================================
+// エラー表示
+// =====================================================================
+function showError(msg) {
+    document.getElementById('publish-notice').style.display = 'block';
+    document.getElementById('petition-list').innerHTML = `
+        <div class="error-state">
+            <div class="icon">⚠️</div>
+            <h3>データの読み込みに失敗しました</h3>
+            <p>Googleスプレッドシートの公開設定を確認してください。</p>
+            <div class="error-detail">
+                <strong>考えられる原因：</strong><br>
+                ・インターネット接続が不安定<br>
+                ・スプレッドシートの「ウェブに公開」設定が解除された<br>
+                ・Googleのサーバーが一時的に応答していない<br><br>
+                <em>エラー内容: ${escHtml(msg)}</em>
+            </div>
+            <button class="reload-btn" style="margin-top:10px;" onclick="loadData()">🔄 再試行</button>
+        </div>`;
+}
+
+// =====================================================================
+// ナビゲーション
+// =====================================================================
+function toggleNav() { document.getElementById('main-nav').classList.toggle('open'); }
+
+// =====================================================================
+// 初回読み込み
+// =====================================================================
+loadData();
+</script>
+</body>
+</html>

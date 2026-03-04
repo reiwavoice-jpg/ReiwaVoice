@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>令和ボイス | 行政の嘘を暴き、現役世代の怒りを形にする</title>
+    <style>
+        :root { --main-bg: #0d0d0d; --text-color: #f2f2f2; --accent-red: #e60000; --accent-dark-red: #990000; --card-bg: #1a1a1a; }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif; background-color: var(--main-bg); color: var(--text-color); line-height: 1.6; }
+
+        /* ===== ナビゲーション ===== */
+        header {
+            background-color: #000; padding: 0 5%;
+            border-bottom: 2px solid var(--accent-red);
+            position: sticky; top: 0; z-index: 100;
+        }
+        .header-inner {
+            display: flex; justify-content: space-between;
+            align-items: center; height: 60px;
+        }
+        .site-logo {
+            font-size: 1.5rem; font-weight: bold; letter-spacing: 2px;
+            color: #fff; text-decoration: none;
+        }
+        nav { display: flex; align-items: center; gap: 5px; }
+        nav a {
+            color: #ccc; text-decoration: none; padding: 8px 14px;
+            border-radius: 4px; font-size: 0.9rem; transition: 0.2s;
+        }
+        nav a:hover { color: #fff; background: #1a1a1a; }
+        nav a.active { color: var(--accent-red); border-bottom: 2px solid var(--accent-red); border-radius: 0; }
+        .nav-cta {
+            background: var(--accent-red) !important; color: #fff !important;
+            font-weight: bold; border-radius: 4px !important; border-bottom: none !important;
+        }
+        .nav-cta:hover { background: var(--accent-dark-red) !important; }
+        .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 5px; }
+        .hamburger span { display: block; width: 22px; height: 2px; background: #fff; }
+
+        /* ===== ヒーロー ===== */
+        .hero {
+            padding: 80px 10%; text-align: center;
+            background: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)),
+                url('https://images.unsplash.com/photo-1517732306149-e8f829eb588a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') center/cover;
+            border-bottom: 1px solid #333;
+        }
+        .hero h2 { font-size: 3rem; margin-bottom: 10px; color: var(--accent-red); }
+        .hero p { font-size: 1.1rem; color: #ccc; margin-bottom: 30px; }
+        .hero-btns { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+        .btn-primary {
+            display: inline-block; background: var(--accent-red);
+            color: #fff; text-decoration: none; padding: 15px 35px;
+            font-size: 1.1rem; font-weight: bold; border-radius: 50px; transition: 0.3s;
+        }
+        .btn-primary:hover { background: var(--accent-dark-red); transform: scale(1.03); }
+        .btn-secondary {
+            display: inline-block; background: transparent;
+            color: #fff; text-decoration: none; padding: 14px 30px;
+            font-size: 1rem; border: 2px solid #555; border-radius: 50px; transition: 0.3s;
+        }
+        .btn-secondary:hover { border-color: #fff; }
+
+        /* ===== コンテナ ===== */
+        .container { max-width: 1000px; margin: 0 auto; padding: 60px 20px; }
+        .section-title { font-size: 2rem; border-left: 5px solid var(--accent-red); padding-left: 15px; margin-bottom: 30px; }
+
+        /* ===== 実績バー ===== */
+        .stats-bar {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0; background: #111; border-top: 1px solid #333; border-bottom: 1px solid #333;
+        }
+        .stat-item {
+            padding: 25px 20px; text-align: center;
+            border-right: 1px solid #333;
+        }
+        .stat-item:last-child { border-right: none; }
+        .stat-value { font-size: 2rem; font-weight: bold; color: var(--accent-red); }
+        .stat-label { font-size: 0.8rem; color: #888; margin-top: 4px; }
+
+        /* ===== 理念 ===== */
+        .philosophy-box { background: var(--card-bg); padding: 30px; border-radius: 8px; border: 1px solid #333; margin-bottom: 60px; }
+
+        /* ===== マップエリア ===== */
+        .japan-map-container { background: #111; padding: 30px; border-radius: 10px; border: 1px solid #333; text-align: center; margin-bottom: 60px; }
+        .map-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 20px; }
+        .region-btn { background-color: #222; color: #fff; border: 2px solid #444; padding: 15px; font-size: 1.1rem; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+        .region-btn.active { background-color: var(--accent-red); border-color: var(--accent-red); }
+        .prefecture-panel { display: none; background: #000; border: 1px solid var(--accent-red); padding: 20px; margin-top: 15px; border-radius: 6px; text-align: left; }
+        .pref-tag { display: inline-block; background: #222; margin: 5px; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; }
+        .pref-tag.target { color: var(--accent-red); font-weight: bold; border: 1px solid var(--accent-red); }
+
+        /* ===== カード ===== */
+        .petition-card { background: linear-gradient(145deg, #111, #1a1a1a); border: 1px solid #444; padding: 30px; border-radius: 8px; margin-bottom: 30px; position: relative; }
+        .status-badge { position: absolute; top: -12px; right: 20px; background: var(--accent-red); padding: 6px 12px; font-weight: bold; font-size: 0.9rem; border-radius: 4px; }
+        .action-area { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 20px; border-top: 1px dashed #444; flex-wrap: wrap; gap: 10px; }
+        .doc-link { color: #fff; text-decoration: none; border-bottom: 1px solid #fff; padding-bottom: 2px; cursor: pointer; }
+        .like-btn { background: transparent; border: 2px solid var(--accent-red); color: var(--accent-red); padding: 12px 25px; font-size: 1.2rem; font-weight: bold; border-radius: 50px; cursor: pointer; display: flex; align-items: center; gap: 10px; }
+        .like-btn.clicked { background: var(--accent-red); color: #fff; }
+
+        /* ===== モーダル ===== */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { background: #111; padding: 30px; border-radius: 8px; border: 1px solid var(--accent-red); max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; position: relative; }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #888; }
+        .close-btn:hover { color: #fff; }
+
+        /* ===== CTAバナー ===== */
+        .cta-home {
+            background: linear-gradient(135deg, #1a0000, #2a0000);
+            border: 1px solid var(--accent-red); border-radius: 10px;
+            padding: 50px; text-align: center; margin-top: 20px;
+        }
+        .cta-home h2 { color: var(--accent-red); margin-top: 0; font-size: 1.8rem; }
+        .cta-home p { color: #ccc; margin-bottom: 25px; font-size: 1.05rem; }
+
+        /* ===== フッター ===== */
+        footer { background: #000; border-top: 1px solid #333; text-align: center; padding: 30px 20px; color: #555; font-size: 0.85rem; margin-top: 0; }
+        footer a { color: #888; text-decoration: none; margin: 0 10px; }
+        footer a:hover { color: #fff; }
+
+        @media (max-width: 768px) {
+            nav { display: none; flex-direction: column; position: absolute; top: 60px; left: 0; width: 100%; background: #000; padding: 20px; gap: 10px; border-bottom: 1px solid #333; }
+            nav.open { display: flex; }
+            .hamburger { display: flex; }
+            .hero h2 { font-size: 2rem; }
+            .section-title { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-inner">
+            <a href="index.html" class="site-logo">令和ボイス</a>
+            <nav id="main-nav">
+                <a href="about.html">使い方</a>
+                <a href="form.html">不満を投稿</a>
+                <a href="petitions.html">陳情書一覧</a>
+                <a href="results.html">活動実績</a>
+                <a href="form.html" class="nav-cta">今すぐ声を上げる</a>
+            </nav>
+            <div class="hamburger" onclick="toggleNav()"><span></span><span></span><span></span></div>
+        </div>
+    </header>
+
+    <div class="hero">
+        <h2>行政の「嘘」を暴け。</h2>
+        <p>現役世代の怒りを、致死量の論理（データ）で自治体に叩きつける。</p>
+        <div class="hero-btns">
+            <a href="form.html" class="btn-primary">🔥 今すぐ声を上げる</a>
+            <a href="about.html" class="btn-secondary">仕組みを知る</a>
+        </div>
+    </div>
+
+    <!-- 実績バー -->
+    <div class="stats-bar">
+        <div class="stat-item"><div class="stat-value">47</div><div class="stat-label">生成された陳情書</div></div>
+        <div class="stat-item"><div class="stat-value">12</div><div class="stat-label">議会へ提出済み</div></div>
+        <div class="stat-item"><div class="stat-value">13,333</div><div class="stat-label">累計賛同数</div></div>
+        <div class="stat-item"><div class="stat-value">19</div><div class="stat-label">活動中の都道府県</div></div>
+        <div class="stat-item"><div class="stat-value">3</div><div class="stat-label">行政が対応・改善</div></div>
+    </div>
+
+    <div class="container">
+        <div class="philosophy-box">
+            <h2 class="section-title" style="margin-top:0;">理念：なぜ我々は動くのか</h2>
+            <p>税金を納める現役世代が、なぜ治安の悪化に怯え、後回しにされなければならないのか。<br>
+            「令和ボイス」は、耳障りの良い<strong>「計画書」</strong>と<strong>「決算データ」</strong>の矛盾をAIで徹底解析。あなたの「いいね」が、議会を動かす弾丸になります。</p>
+        </div>
+
+        <!-- マップエリア -->
+        <div class="japan-map-container" id="map-search">
+            <h2 style="margin-top:0;">🗺️ 追及ターゲットを検索</h2>
+            <div class="map-grid">
+                <button class="region-btn" onclick="toggleRegion('hokkaido', event)">北海道・東北</button>
+                <button class="region-btn" onclick="toggleRegion('kanto', event)">関東</button>
+                <button class="region-btn" onclick="toggleRegion('chubu', event)">中部</button>
+                <button class="region-btn" onclick="toggleRegion('kinki', event)">近畿</button>
+                <button class="region-btn" onclick="toggleRegion('chugoku', event)">中国・四国</button>
+                <button class="region-btn" onclick="toggleRegion('kyushu', event)">九州・沖縄</button>
+            </div>
+            <div id="hokkaido-panel" class="prefecture-panel"><h3 style="color:var(--accent-red); margin-top:0;">▼ 北海道・東北</h3><span class="pref-tag">北海道</span><span class="pref-tag">青森県</span><span class="pref-tag">岩手県</span><span class="pref-tag">宮城県</span><span class="pref-tag">秋田県</span><span class="pref-tag">山形県</span><span class="pref-tag">福島県</span></div>
+            <div id="kanto-panel" class="prefecture-panel"><h3 style="color:var(--accent-red); margin-top:0;">▼ 関東</h3><span class="pref-tag target">東京都（葛飾区 進行中🔥）</span><span class="pref-tag">神奈川県</span><span class="pref-tag">埼玉県</span><span class="pref-tag">千葉県</span><span class="pref-tag">茨城県</span><span class="pref-tag">栃木県</span><span class="pref-tag">群馬県</span></div>
+            <div id="chubu-panel" class="prefecture-panel"><h3 style="color:var(--accent-red); margin-top:0;">▼ 中部</h3><span class="pref-tag">新潟県</span><span class="pref-tag">富山県</span><span class="pref-tag">石川県</span><span class="pref-tag">福井県</span><span class="pref-tag">山梨県</span><span class="pref-tag">長野県</span><span class="pref-tag">岐阜県</span><span class="pref-tag">静岡県</span><span class="pref-tag target">愛知県（名古屋市 審議中🏛️）</span></div>
+            <div id="kinki-panel" class="prefecture-panel"><h3 style="color:var(--accent-red); margin-top:0;">▼ 近畿</h3><span class="pref-tag">三重県</span><span class="pref-tag">滋賀県</span><span class="pref-tag">京都府</span><span class="pref-tag">大阪府</span><span class="pref-tag">兵庫県</span><span class="pref-tag">奈良県</span><span class="pref-tag">和歌山県</span></div>
+            <div id="chugoku-panel" class="prefecture-panel"><h3 style="color:var(--accent-red); margin-top:0;">▼ 中国・四国</h3><span class="pref-tag">鳥取県</span><span class="pref-tag">島根県</span><span class="pref-tag">岡山県</span><span class="pref-tag">広島県</span><span class="pref-tag">山口県</span><span class="pref-tag">徳島県</span><span class="pref-tag">香川県</span><span class="pref-tag">愛媛県</span><span class="pref-tag">高知県</span></div>
+            <div id="kyushu-panel" class="prefecture-panel"><h3 style="color:var(--accent-red); margin-top:0;">▼ 九州・沖縄</h3><span class="pref-tag target">福岡県（福岡市 審議中🏛️）</span><span class="pref-tag">佐賀県</span><span class="pref-tag">長崎県</span><span class="pref-tag">熊本県</span><span class="pref-tag">大分県</span><span class="pref-tag">宮崎県</span><span class="pref-tag">鹿児島県</span><span class="pref-tag">沖縄県</span></div>
+            <p style="margin-top:20px;"><a href="petitions.html" style="color:var(--accent-red);">→ すべての陳情書を見る</a></p>
+        </div>
+
+        <h2 class="section-title">🔥 進行中の追及プロジェクト</h2>
+        <div class="petition-card">
+            <div class="status-badge">議会提出準備中 / 賛同募集中</div>
+            <h3 style="color:#fff;">【東京都葛飾区】安全・安心のまちづくりの虚飾と民泊拡大への追及</h3>
+            <p style="color:#bbb;"><strong>■ 暴いた矛盾：</strong> 区はマスタープランで「安全な住環境」を約束しておきながら、決算データにおける防犯への予算投下を軽視している事実が発覚。</p>
+            <div class="action-area">
+                <span class="doc-link" onclick="openModal()">📄 陳情書全文（草案）を読む</span>
+                <button class="like-btn" id="like-btn-1" onclick="addLike()"><span>🔥 怒りの鉄槌を下す</span><span id="count-1">1,452</span></button>
+            </div>
+        </div>
+
+        <p style="text-align:center; margin-top: -10px;">
+            <a href="petitions.html" class="btn-primary" style="font-size:1rem; padding:12px 30px;">→ すべての陳情書一覧を見る</a>
+        </p>
+
+        <!-- ホームCTA -->
+        <div class="cta-home">
+            <h2>あなたの地元でも、追及できる</h2>
+            <p>2分のフォーム入力で、あなたの不満がAIによって陳情書に変わります。<br>全国どの自治体でも対応可能です。</p>
+            <a href="form.html" class="btn-primary">🔥 今すぐ不満を投稿する</a>
+        </div>
+
+    </div>
+
+    <!-- モーダル（陳情書全文） -->
+    <div class="modal-overlay" id="petition-modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">×</span>
+            <h3 style="color:var(--accent-red); border-bottom:1px solid #333; padding-bottom:10px;">東京都葛飾区議会 提出予定草案</h3>
+            <p><strong>【陳情趣旨】</strong><br>
+            葛飾区が掲げる「安全・安心のまちづくり」と、実際の予算執行における乖離を是正し、住居専用地域における民泊の制限および防犯パトロールの強化を求める。</p>
+            <p><strong>【陳情理由】</strong><br>
+            令和X年度決算データとAI解析の結果、防犯カメラ設置や見回りに対する予算配分が、マスタープランの目標値に対して不足していることが明白である。一方で、民泊等の観光インフラ拡充には偏った予算が投下されており、地域住民の不安を煽る結果となっている。現役世代の税金は、まず我々の生活の安全に還元されるべきである。</p>
+            <p style="margin-top:20px;"><a href="petitions.html" style="color:var(--accent-red);">→ すべての陳情書を見る</a></p>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 令和ボイス All Rights Reserved.</p>
+        <p>
+            <a href="index.html">トップ</a>
+            <a href="about.html">使い方</a>
+            <a href="form.html">不満を投稿</a>
+            <a href="petitions.html">陳情書一覧</a>
+            <a href="results.html">活動実績</a>
+        </p>
+    </footer>
+
+    <script>
+        function toggleNav() {
+            document.getElementById('main-nav').classList.toggle('open');
+        }
+
+        function toggleRegion(regionId, e) {
+            const panel = document.getElementById(regionId + '-panel');
+            const isOpen = panel.style.display === 'block';
+            document.querySelectorAll('.prefecture-panel').forEach(p => p.style.display = 'none');
+            document.querySelectorAll('.region-btn').forEach(b => b.classList.remove('active'));
+            if (!isOpen) {
+                panel.style.display = 'block';
+                e.target.classList.add('active');
+            }
+        }
+
+        function openModal() { document.getElementById('petition-modal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('petition-modal').style.display = 'none'; }
+
+        let isClicked = false;
+        function addLike() {
+            if (isClicked) return;
+            let currentCount = parseInt(document.getElementById('count-1').innerText.replace(',', ''));
+            document.getElementById('count-1').innerText = (currentCount + 1).toLocaleString();
+            document.getElementById('like-btn-1').classList.add('clicked');
+            document.getElementById('like-btn-1').innerHTML = `<span>🔥 賛同完了！</span> <span>${(currentCount + 1).toLocaleString()}</span>`;
+            isClicked = true;
+        }
+    </script>
+</body>
+</html>
