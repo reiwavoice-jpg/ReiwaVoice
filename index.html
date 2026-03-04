@@ -87,8 +87,21 @@
         .region-btn { background-color: #222; color: #fff; border: 2px solid #444; padding: 15px; font-size: 1.1rem; font-weight: bold; border-radius: 6px; cursor: pointer; transition: 0.2s; }
         .region-btn.active { background-color: var(--accent-red); border-color: var(--accent-red); }
         .prefecture-panel { display: none; background: #000; border: 1px solid var(--accent-red); padding: 20px; margin-top: 15px; border-radius: 6px; text-align: left; }
-        .pref-tag { display: inline-block; background: #222; margin: 5px; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; }
+        .pref-tag { display: inline-block; background: #222; margin: 5px; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; transition: 0.2s; }
+        .pref-tag:hover { background: #333; }
         .pref-tag.target { color: var(--accent-red); font-weight: bold; border: 1px solid var(--accent-red); }
+        .pref-tag.selected { background: var(--accent-red); color: #fff; border-color: var(--accent-red); }
+
+        /* ===== 自治体パネル ===== */
+        .muni-panel { display: none; margin-top: 15px; background: #0a0a0a; border: 1px solid #333; border-radius: 6px; padding: 15px; text-align: left; }
+        .muni-panel.open { display: block; }
+        .muni-panel-title { font-size: 0.85rem; color: #666; margin-bottom: 10px; border-bottom: 1px solid #222; padding-bottom: 8px; }
+        .muni-item { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #111; flex-wrap: wrap; }
+        .muni-item:last-child { border-bottom: none; }
+        .muni-name { font-weight: bold; min-width: 130px; font-size: 0.95rem; }
+        .muni-stat { font-size: 0.75rem; padding: 3px 8px; background: #1a1a1a; border-radius: 20px; color: #888; }
+        .muni-stat.active { color: #e6a000; border: 1px solid #e6a00055; }
+        .muni-stat.sent { color: var(--accent-red); border: 1px solid var(--accent-red); background: #1a0000; }
 
         /* ===== カード ===== */
         .petition-card { background: linear-gradient(145deg, #111, #1a1a1a); border: 1px solid #444; padding: 30px; border-radius: 8px; margin-bottom: 30px; position: relative; }
@@ -227,11 +240,14 @@
         const COL = { timestamp:0, prefecture:1, municipality:2, complaint:6, category:7, status:11, petitionUrl:12, likeCount:14 };
 
         // ===== データ読み込み =====
+        let prefMuniData = {}; // 都道府県 → 自治体 → 統計
+
         async function loadIndexData() {
             try {
                 const res = await fetch(SHEET_URL);
                 if (!res.ok) throw new Error();
                 const data = rowsToObjects(parseCSV(await res.text()));
+                buildPrefMuniData(data);
                 updateStats(data);
                 updatePrefMap(data);
                 updateProjects(data);
@@ -239,6 +255,65 @@
                 document.getElementById('project-cards').innerHTML =
                     '<p style="color:#666;text-align:center;">データを読み込めませんでした</p>';
             }
+        }
+
+        // ===== 都道府県×自治体データ構築 =====
+        function buildPrefMuniData(data) {
+            prefMuniData = {};
+            data.forEach(r => {
+                if (!r.prefecture || !r.municipality) return;
+                if (!prefMuniData[r.prefecture]) prefMuniData[r.prefecture] = {};
+                const m = r.municipality;
+                if (!prefMuniData[r.prefecture][m]) prefMuniData[r.prefecture][m] = { total: 0, generated: 0, sent: 0 };
+                prefMuniData[r.prefecture][m].total++;
+                if (r.status && (r.status.includes('生成完了') || r.status.includes('送付準備') || r.status.includes('送付完了')))
+                    prefMuniData[r.prefecture][m].generated++;
+                if (r.status && r.status.includes('送付完了'))
+                    prefMuniData[r.prefecture][m].sent++;
+            });
+        }
+
+        // ===== 自治体パネル表示 =====
+        function showMunicipalities(prefecture, tag) {
+            // 既存の自治体パネルを全て閉じる
+            document.querySelectorAll('.muni-panel').forEach(p => p.classList.remove('open'));
+            document.querySelectorAll('.pref-tag').forEach(t => t.classList.remove('selected'));
+
+            // 同じタグを再クリックで閉じる
+            const panelId = 'muni-' + prefecture.replace(/[^\w]/g, '_');
+            let panel = document.getElementById(panelId);
+            if (panel && panel.dataset.open === '1') {
+                panel.dataset.open = '0';
+                return;
+            }
+
+            tag.classList.add('selected');
+
+            // パネルがなければ作成してタグの親に追加
+            if (!panel) {
+                panel = document.createElement('div');
+                panel.className = 'muni-panel';
+                panel.id = panelId;
+                tag.parentNode.appendChild(panel);
+            }
+            panel.dataset.open = '1';
+
+            const munis = prefMuniData[prefecture];
+            if (!munis || Object.keys(munis).length === 0) {
+                panel.innerHTML = '<p class="muni-panel-title">この都道府県のデータはまだありません</p>';
+            } else {
+                const rows = Object.entries(munis)
+                    .sort((a, b) => b[1].total - a[1].total)
+                    .map(([name, s]) => `
+                    <div class="muni-item">
+                        <span class="muni-name">${escHtml(name)}</span>
+                        <span class="muni-stat">📝 回答 ${s.total}件</span>
+                        <span class="muni-stat active">📄 生成 ${s.generated}件</span>
+                        <span class="muni-stat${s.sent > 0 ? ' sent' : ''}">🏛️ 送付 ${s.sent}件</span>
+                    </div>`).join('');
+                panel.innerHTML = `<div class="muni-panel-title">📍 ${escHtml(prefecture)} の自治体一覧</div>${rows}`;
+            }
+            panel.classList.add('open');
         }
 
         // ===== 実績バー更新 =====
@@ -275,6 +350,9 @@
                     const emoji = getStatusEmoji(prefMap[match].status);
                     tag.textContent = `${match}${emoji ? '（' + emoji + '）' : ''}`;
                 }
+                // 全ての都道府県タグにクリックイベントを追加
+                const prefName = tag.textContent.trim().replace(/（.*）/, '');
+                tag.onclick = () => showMunicipalities(prefName, tag);
             });
         }
         function getStatusEmoji(status) {
