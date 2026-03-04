@@ -202,120 +202,44 @@
         <div class="kpi-grid">
             <div class="kpi-card">
                 <div class="kpi-icon">📝</div>
-                <div class="kpi-value" id="kpi-petitions">0</div>
+                <div class="kpi-value" id="kpi-petitions">－</div>
                 <div class="kpi-label">生成された陳情書（通）</div>
-                <div class="kpi-change">▲ 先月比 +12件</div>
             </div>
             <div class="kpi-card">
                 <div class="kpi-icon">🏛️</div>
-                <div class="kpi-value" id="kpi-submitted">0</div>
+                <div class="kpi-value" id="kpi-submitted">－</div>
                 <div class="kpi-label">議会へ提出済み（件）</div>
-                <div class="kpi-change">▲ 先月比 +3件</div>
             </div>
             <div class="kpi-card">
                 <div class="kpi-icon">🔥</div>
-                <div class="kpi-value" id="kpi-likes">0</div>
+                <div class="kpi-value" id="kpi-likes">－</div>
                 <div class="kpi-label">累計賛同数</div>
-                <div class="kpi-change">▲ 先月比 +2,140票</div>
             </div>
             <div class="kpi-card">
                 <div class="kpi-icon">🗾</div>
-                <div class="kpi-value" id="kpi-prefectures">0</div>
+                <div class="kpi-value" id="kpi-prefectures">－</div>
                 <div class="kpi-label">活動中の都道府県</div>
-                <div class="kpi-change">▲ 先月比 +4都道府県</div>
             </div>
             <div class="kpi-card">
                 <div class="kpi-icon">✅</div>
-                <div class="kpi-value" id="kpi-results">0</div>
+                <div class="kpi-value" id="kpi-results">－</div>
                 <div class="kpi-label">行政が対応・改善（件）</div>
-                <div class="kpi-change">直近6ヶ月</div>
             </div>
         </div>
 
-        <!-- 活動タイムライン -->
+        <!-- 活動タイムライン（動的生成） -->
         <h2 class="section-title">📅 活動タイムライン</h2>
-        <div class="timeline">
-            <div class="timeline-item">
-                <div class="timeline-date">2025年11月</div>
-                <div class="timeline-card submitted">
-                    <span class="timeline-badge badge-submitted">🏛️ 議会提出</span>
-                    <h3>東京都葛飾区議会に「防犯対策強化・民泊規制」陳情書を提出</h3>
-                    <p>賛同数1,452名を集めた陳情書を正式に葛飾区議会事務局へ提出。令和ボイス初の正式提出案件として記録。</p>
-                </div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-date">2025年10月</div>
-                <div class="timeline-card">
-                    <span class="timeline-badge badge-result">🏛️ 審議結果</span>
-                    <h3>愛知県名古屋市「耐震改修前倒し」陳情が議会で採択</h3>
-                    <p>4,890名が賛同した校舎耐震化を求める陳情書が名古屋市議会の文教委員会で採択。改修計画の前倒しが決定。</p>
-                </div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-date">2025年09月</div>
-                <div class="timeline-card success">
-                    <span class="timeline-badge badge-success">✅ 行政が対応</span>
-                    <h3>神奈川県横浜市が公園廃止計画を一部撤回・説明会を開催</h3>
-                    <p>2,341名が賛同した公園保全陳情に対し、横浜市が住民説明会を開催。廃止予定3公園のうち2公園の計画撤回が発表された。</p>
-                </div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-date">2025年08月</div>
-                <div class="timeline-card submitted">
-                    <span class="timeline-badge badge-submitted">🏛️ 議会提出</span>
-                    <h3>福岡県福岡市議会に窓口業務コスト公開を求める陳情書を提出</h3>
-                    <p>賛同数3,120名を集め、市議会総務委員会に提出。次回定例議会での審議が確定。</p>
-                </div>
-            </div>
-            <div class="timeline-item">
-                <div class="timeline-date">2025年07月</div>
-                <div class="timeline-card">
-                    <span class="timeline-badge" style="background:#1a1a00;color:#e6c000;border:1px solid #e6c000;">🚀 サービス開始</span>
-                    <h3>令和ボイス β版サービス開始</h3>
-                    <p>AIによる陳情書自動生成システムが稼働開始。初月から全国15都道府県で不満投稿が寄せられ、即日100件超の陳情書が生成された。</p>
-                </div>
+        <div class="timeline" id="timeline-container">
+            <div style="text-align:center;padding:40px;color:#666;">
+                <div style="width:30px;height:30px;border:3px solid #333;border-top-color:#e60000;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 15px;"></div>
+                読み込み中…
             </div>
         </div>
 
-        <!-- 都道府県ランキング -->
+        <!-- 都道府県ランキング（動的生成） -->
         <h2 class="section-title">🗾 都道府県別・賛同数ランキング</h2>
-        <div class="ranking-list">
-            <div class="rank-item">
-                <div class="rank-num gold">🥇</div>
-                <div class="rank-pref">愛知県</div>
-                <div class="rank-bar-wrap"><div class="rank-bar"><div class="rank-fill" style="width:100%"></div></div></div>
-                <div class="rank-count">4,890</div>
-            </div>
-            <div class="rank-item">
-                <div class="rank-num silver">🥈</div>
-                <div class="rank-pref">福岡県</div>
-                <div class="rank-bar-wrap"><div class="rank-bar"><div class="rank-fill" style="width:64%"></div></div></div>
-                <div class="rank-count">3,120</div>
-            </div>
-            <div class="rank-item">
-                <div class="rank-num bronze">🥉</div>
-                <div class="rank-pref">神奈川県</div>
-                <div class="rank-bar-wrap"><div class="rank-bar"><div class="rank-fill" style="width:48%"></div></div></div>
-                <div class="rank-count">2,341</div>
-            </div>
-            <div class="rank-item">
-                <div class="rank-num">4</div>
-                <div class="rank-pref">東京都</div>
-                <div class="rank-bar-wrap"><div class="rank-bar"><div class="rank-fill" style="width:30%"></div></div></div>
-                <div class="rank-count">1,452</div>
-            </div>
-            <div class="rank-item">
-                <div class="rank-num">5</div>
-                <div class="rank-pref">大阪府</div>
-                <div class="rank-bar-wrap"><div class="rank-bar"><div class="rank-fill" style="width:18%"></div></div></div>
-                <div class="rank-count">876</div>
-            </div>
-            <div class="rank-item">
-                <div class="rank-num">6</div>
-                <div class="rank-pref">埼玉県</div>
-                <div class="rank-bar-wrap"><div class="rank-bar"><div class="rank-fill" style="width:13%"></div></div></div>
-                <div class="rank-count">654</div>
-            </div>
+        <div class="ranking-list" id="ranking-container">
+            <div style="text-align:center;padding:30px;color:#666;">読み込み中…</div>
         </div>
 
         <!-- CTA -->
@@ -339,34 +263,245 @@
     </footer>
 
     <script>
-        function toggleNav() {
-            document.getElementById('main-nav').classList.toggle('open');
-        }
+// =====================================================================
+// 設定（petitions.html と同じ CSV URL）
+// =====================================================================
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTCYqqRhudBfLXTNMov8_H4EPI4lWO5H-fYOsyq8W-nUnHmaIhrSFzshpiE21iARgxIUAOvai_kB38t/pub?gid=1710597455&single=true&output=csv';
 
-        // カウントアップアニメーション
-        function countUp(id, target, suffix = '') {
-            let current = 0;
-            const step = Math.ceil(target / 60);
-            const timer = setInterval(() => {
-                current = Math.min(current + step, target);
-                document.getElementById(id).textContent = current.toLocaleString() + suffix;
-                if (current >= target) clearInterval(timer);
-            }, 30);
-        }
+const COL = {
+    timestamp: 0, prefecture: 1, municipality: 2,
+    complaint: 6, category: 7,
+    status: 11, petitionUrl: 12,
+    likeCount: 14
+};
 
-        // IntersectionObserver でスクロール時に発火
-        const kpiSection = document.querySelector('.kpi-grid');
-        const observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) {
-                countUp('kpi-petitions', 47);
-                countUp('kpi-submitted', 12);
-                countUp('kpi-likes', 13333);
-                countUp('kpi-prefectures', 19);
-                countUp('kpi-results', 3);
-                observer.disconnect();
-            }
-        }, { threshold: 0.3 });
-        observer.observe(kpiSection);
+// =====================================================================
+// メイン：データ読み込み → 各セクション描画
+// =====================================================================
+async function loadResults() {
+    try {
+        const res = await fetch(SHEET_URL);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const rows = parseCSV(await res.text());
+        const data = rowsToObjects(rows);
+        renderKPIs(data);
+        renderTimeline(data);
+        renderRanking(data);
+    } catch (err) {
+        console.error(err);
+        document.getElementById('timeline-container').innerHTML =
+            `<p style="color:#e60000;text-align:center;padding:30px;">データ読み込みエラー: ${err.message}</p>`;
+    }
+}
+
+// =====================================================================
+// KPI 集計 & カウントアップ表示
+// =====================================================================
+function renderKPIs(data) {
+    const total      = data.filter(r => r.petitionUrl || r.complaint).length;
+    const submitted  = data.filter(r => r.status && (
+        r.status.includes('送付完了') || r.status.includes('送付準備')
+    )).length;
+    const totalLikes = data.reduce((s, r) => s + (r.likeCount || 0), 0);
+    const prefs      = new Set(data.map(r => r.prefecture).filter(Boolean)).size;
+    const improved   = data.filter(r => r.status && (
+        r.status.includes('改善') || r.status.includes('対応') || r.status.includes('採択')
+    )).length;
+
+    // KPIグリッドが画面に入ったときカウントアップ
+    const kpiGrid = document.querySelector('.kpi-grid');
+    const observer = new IntersectionObserver(entries => {
+        if (!entries[0].isIntersecting) return;
+        countUp('kpi-petitions',   total);
+        countUp('kpi-submitted',   submitted);
+        countUp('kpi-likes',       totalLikes);
+        countUp('kpi-prefectures', prefs);
+        countUp('kpi-results',     improved);
+        observer.disconnect();
+    }, { threshold: 0.3 });
+    observer.observe(kpiGrid);
+}
+
+// =====================================================================
+// タイムライン描画
+// =====================================================================
+function renderTimeline(data) {
+    const container = document.getElementById('timeline-container');
+
+    // ステータスが重要なもの（生成完了・送付準備・送付完了・改善など）を抽出
+    const events = data
+        .filter(r => r.status && (
+            r.status.includes('生成完了') || r.status.includes('送付準備') ||
+            r.status.includes('送付完了') || r.status.includes('改善') ||
+            r.status.includes('採択') || r.status.includes('対応')
+        ))
+        .sort((a, b) => b.timestamp.localeCompare(a.timestamp))
+        .slice(0, 10);
+
+    // サービス開始イベント（常に末尾に追加）
+    const startHtml = `
+        <div class="timeline-item">
+            <div class="timeline-date">サービス開始</div>
+            <div class="timeline-card">
+                <span class="timeline-badge" style="background:#1a1a00;color:#e6c000;border:1px solid #e6c000;">🚀 開始</span>
+                <h3>令和ボイス サービス開始</h3>
+                <p>AIによる陳情書自動生成システムが稼働開始。全国から市民の声を集め、議会への陳情書作成を支援します。</p>
+            </div>
+        </div>`;
+
+    if (events.length === 0) {
+        container.innerHTML = startHtml;
+        return;
+    }
+
+    container.innerHTML = events.map(r => {
+        const loc = [r.prefecture, r.municipality].filter(Boolean).join(' ');
+        const cat = r.category ? `【${r.category}】` : '';
+        return `
+        <div class="timeline-item">
+            <div class="timeline-date">${escHtml(r.timestamp)}</div>
+            <div class="timeline-card ${getCardClass(r.status)}">
+                <span class="timeline-badge ${getBadgeClass(r.status)}">${getBadgeLabel(r.status)}</span>
+                <h3>【${escHtml(loc)}】${escHtml(cat)}への追及</h3>
+                <p>${r.complaint ? escHtml(r.complaint.slice(0, 80)) + '…' : ''}</p>
+            </div>
+        </div>`;
+    }).join('') + startHtml;
+}
+
+// =====================================================================
+// 都道府県ランキング描画
+// =====================================================================
+function renderRanking(data) {
+    const container = document.getElementById('ranking-container');
+
+    // 都道府県ごとに集計
+    const map = {};
+    data.forEach(r => {
+        if (!r.prefecture) return;
+        if (!map[r.prefecture]) map[r.prefecture] = { count: 0, likes: 0 };
+        map[r.prefecture].count++;
+        map[r.prefecture].likes += (r.likeCount || 0);
+    });
+
+    const ranking = Object.entries(map)
+        .map(([pref, s]) => ({ pref, ...s }))
+        .sort((a, b) => b.likes - a.likes || b.count - a.count)
+        .slice(0, 10);
+
+    if (ranking.length === 0) {
+        container.innerHTML = '<p style="color:#666;text-align:center;padding:30px;">まだデータがありません</p>';
+        return;
+    }
+
+    const maxLikes = ranking[0].likes || ranking[0].count || 1;
+    const medals   = ['🥇', '🥈', '🥉'];
+
+    container.innerHTML = ranking.map((r, i) => {
+        const numClass = ['gold','silver','bronze'][i] || '';
+        const numLabel = i < 3 ? medals[i] : (i + 1);
+        const val      = r.likes > 0 ? r.likes.toLocaleString() + ' 票' : r.count + ' 件';
+        const pct      = Math.max(Math.round((r.likes || r.count) / maxLikes * 100), 3);
+        return `
+        <div class="rank-item">
+            <div class="rank-num ${numClass}">${numLabel}</div>
+            <div class="rank-pref">${escHtml(r.pref)}</div>
+            <div class="rank-bar-wrap">
+                <div class="rank-bar"><div class="rank-fill" style="width:${pct}%"></div></div>
+            </div>
+            <div class="rank-count">${val}</div>
+        </div>`;
+    }).join('');
+}
+
+// =====================================================================
+// ユーティリティ
+// =====================================================================
+function parseCSV(text) {
+    const rows = [];
+    let row = [], field = '', inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+        const ch = text[i], next = text[i+1];
+        if (inQuotes) {
+            if (ch === '"' && next === '"') { field += '"'; i++; }
+            else if (ch === '"')            { inQuotes = false; }
+            else                            { field += ch; }
+        } else {
+            if      (ch === '"')                        { inQuotes = true; }
+            else if (ch === ',')                        { row.push(field); field = ''; }
+            else if (ch === '\n' || (ch==='\r'&&next==='\n')) {
+                if (ch === '\r') i++;
+                row.push(field); rows.push(row); row = []; field = '';
+            } else { field += ch; }
+        }
+    }
+    if (field !== '' || row.length > 0) { row.push(field); rows.push(row); }
+    return rows;
+}
+
+function rowsToObjects(rows) {
+    if (!rows || rows.length < 2) return [];
+    return rows.slice(1).map((c, i) => {
+        const get = j => (c[j] !== undefined ? c[j].trim() : '');
+        return {
+            id: i, sheetRowNum: i + 2,
+            timestamp: get(COL.timestamp), prefecture: get(COL.prefecture),
+            municipality: get(COL.municipality), complaint: get(COL.complaint),
+            category: get(COL.category), status: get(COL.status),
+            petitionUrl: get(COL.petitionUrl),
+            likeCount: parseInt(get(COL.likeCount)) || 0,
+        };
+    }).filter(p => p.prefecture && p.prefecture !== 'Q1. お住まいの都道府県を選択してください' && (p.complaint || p.petitionUrl));
+}
+
+function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function getCardClass(status) {
+    if (!status) return '';
+    if (status.includes('改善') || status.includes('採択') || status.includes('対応')) return 'success';
+    if (status.includes('送付完了') || status.includes('送付準備')) return 'submitted';
+    return '';
+}
+
+function getBadgeClass(status) {
+    if (!status) return '';
+    if (status.includes('改善') || status.includes('採択') || status.includes('対応')) return 'badge-success';
+    if (status.includes('送付完了')) return 'badge-submitted';
+    if (status.includes('送付準備')) return 'badge-result';
+    if (status.includes('生成完了')) return 'badge-result';
+    return '';
+}
+
+function getBadgeLabel(status) {
+    if (!status) return status;
+    if (status.includes('改善') || status.includes('採択')) return '✅ 行政が対応';
+    if (status.includes('対応')) return '✅ 行政が対応';
+    if (status.includes('送付完了')) return '🏛️ 自治体へ送付完了';
+    if (status.includes('送付準備')) return '📮 送付準備中';
+    if (status.includes('生成完了')) return '📄 陳情書生成完了';
+    return status;
+}
+
+function countUp(id, target) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    let cur = 0;
+    const step = Math.max(1, Math.ceil(target / 60));
+    const timer = setInterval(() => {
+        cur = Math.min(cur + step, target);
+        el.textContent = cur.toLocaleString();
+        if (cur >= target) clearInterval(timer);
+    }, 25);
+}
+
+function toggleNav() {
+    document.getElementById('main-nav').classList.toggle('open');
+}
+
+// 初回ロード
+loadResults();
     </script>
 </body>
 </html>
