@@ -494,9 +494,9 @@ function buildCard(p) {
     const likeCount = p.likeCount || 0;   // スプレッドシートの実数
     const likeLabel = isLiked ? '賛同済み ✓' : `🔥 賛同する`;
 
-    const docBtn = p.petitionUrl
+    const docBtn = (p.petitionUrl && (p.status === '送付準備' || p.status === '送付完了'))
         ? `<a href="${escHtml(p.petitionUrl)}" target="_blank" rel="noopener" class="petition-doc-btn">📄 陳情書全文を読む</a>`
-        : `<span class="petition-doc-btn" style="opacity:0.4;cursor:default;">📄 生成中…</span>`;
+        : `<span class="petition-doc-btn" style="opacity:0.4;cursor:default;">📄 ${p.petitionUrl ? '確認中…' : '生成中…'}</span>`;
 
     return `
     <div class="petition-card" id="card-${p.id}">

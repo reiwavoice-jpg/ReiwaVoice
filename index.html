@@ -361,9 +361,9 @@
                         const statusClass = p.status.includes('送付完了') ? 'sent' :
                                            (p.status.includes('生成完了') || p.status.includes('送付準備')) ? 'generated' : '';
                         const statusLabel = getBadgeLabel(p.status) || p.status || '処理中';
-                        const link = p.petitionUrl
+                        const link = (p.petitionUrl && (p.status === '送付準備' || p.status === '送付完了'))
                             ? `<a href="${escHtml(p.petitionUrl)}" target="_blank" class="petition-list-link">📄 陳情書を読む</a>`
-                            : `<span class="petition-list-link" style="color:#555;">陳情書生成中…</span>`;
+                            : `<span class="petition-list-link" style="color:#555;">${p.petitionUrl ? '確認中…' : '陳情書生成中…'}</span>`;
                         return `
                         <div class="petition-list-item">
                             <div><span class="petition-list-status ${statusClass}">${escHtml(statusLabel)}</span></div>
@@ -453,9 +453,9 @@
                 const cat  = r.category ? `【${escHtml(r.category)}】` : '';
                 const badge = getStatusBadge(r.status);
                 const likes = r.likeCount || 0;
-                const link  = r.petitionUrl
+                const link  = (r.petitionUrl && (r.status === '送付準備' || r.status === '送付完了'))
                     ? `<a href="${escHtml(r.petitionUrl)}" target="_blank" class="doc-link">📄 陳情書全文を読む</a>`
-                    : `<span style="color:#555;">陳情書生成中…</span>`;
+                    : `<span style="color:#555;">${r.petitionUrl ? '確認中…' : '陳情書生成中…'}</span>`;
                 const displayText = r.title
                     ? escHtml(r.title)
                     : (r.category ? `【${escHtml(r.category)}】に関する市民の声` : '行政への陳情');
