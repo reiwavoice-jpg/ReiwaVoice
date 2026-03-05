@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プライバシーポリシー | 令和ボイス</title>
+    <style>
+        :root {
+            --main-bg: #0d0d0d;
+            --text-color: #f2f2f2;
+            --accent-red: #e60000;
+            --accent-dark-red: #990000;
+            --card-bg: #1a1a1a;
+            --border-color: #333;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+            background-color: var(--main-bg);
+            color: var(--text-color);
+            line-height: 1.8;
+        }
+
+        /* ===== ナビゲーション ===== */
+        header {
+            background-color: #000;
+            padding: 0 5%;
+            border-bottom: 2px solid var(--accent-red);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+        }
+        .site-logo {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #fff;
+            text-decoration: none;
+            letter-spacing: 2px;
+        }
+        nav a {
+            color: #ccc;
+            text-decoration: none;
+            margin-left: 24px;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        nav a:hover, nav a.active { color: #fff; }
+        .nav-cta {
+            background: var(--accent-red);
+            color: #fff !important;
+            padding: 6px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .nav-cta:hover { background: var(--accent-dark-red); }
+        .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+        .hamburger span { display: block; width: 24px; height: 2px; background: #fff; margin: 5px 0; }
+
+        @media (max-width: 768px) {
+            .hamburger { display: block; }
+            #main-nav {
+                display: none; flex-direction: column; position: absolute;
+                top: 60px; left: 0; right: 0; background: #111;
+                border-bottom: 2px solid var(--accent-red); padding: 16px 5%;
+            }
+            #main-nav.open { display: flex; }
+            #main-nav a { margin: 8px 0; font-size: 1rem; }
+        }
+
+        /* ===== コンテンツ ===== */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 60px 5% 80px;
+        }
+        .page-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+        .page-subtitle {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 48px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* 非営利バナー */
+        .nonprofit-banner {
+            background: linear-gradient(135deg, #1a2a1a, #1a1a2a);
+            border: 1px solid #2a4a2a;
+            border-left: 4px solid #4caf50;
+            border-radius: 8px;
+            padding: 20px 24px;
+            margin-bottom: 48px;
+        }
+        .nonprofit-banner h3 {
+            color: #4caf50;
+            margin: 0 0 8px;
+            font-size: 1rem;
+            letter-spacing: 1px;
+        }
+        .nonprofit-banner p {
+            color: #ccc;
+            margin: 0;
+            font-size: 0.9rem;
+            line-height: 1.7;
+        }
+
+        /* セクション */
+        .policy-section {
+            margin-bottom: 48px;
+        }
+        .policy-section h2 {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #fff;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 16px;
+        }
+        .policy-section p, .policy-section li {
+            color: #ccc;
+            font-size: 0.92rem;
+            margin-bottom: 10px;
+        }
+        .policy-section ul {
+            padding-left: 1.4em;
+            margin: 0;
+        }
+        .policy-section li {
+            margin-bottom: 6px;
+        }
+        .highlight-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-top: 12px;
+        }
+        .updated {
+            color: #555;
+            font-size: 0.82rem;
+            margin-top: 48px;
+            text-align: right;
+        }
+
+        /* ===== フッター ===== */
+        footer {
+            background: #000;
+            border-top: 1px solid #333;
+            text-align: center;
+            padding: 30px 20px;
+            color: #555;
+            font-size: 0.85rem;
+        }
+        footer a { color: #888; text-decoration: none; margin: 0 10px; }
+        footer a:hover { color: #fff; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-inner">
+            <a href="index.html" class="site-logo">令和ボイス</a>
+            <button class="hamburger" onclick="toggleNav()" aria-label="メニュー">
+                <span></span><span></span><span></span>
+            </button>
+            <nav id="main-nav">
+                <a href="about.html">使い方</a>
+                <a href="form.html">不満を投稿</a>
+                <a href="petitions.html">陳情書一覧</a>
+                <a href="results.html">活動実績</a>
+                <a href="team.html">チーム</a>
+                <a href="form.html" class="nav-cta">今すぐ声を上げる</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <h1 class="page-title">プライバシーポリシー</h1>
+        <p class="page-subtitle">令和ボイス（以下「本サービス」）における個人情報の取り扱いについて定めます。</p>
+
+        <!-- 非営利宣言 -->
+        <div class="nonprofit-banner">
+            <h3>🏛️ 令和ボイスは非営利のシビックテックサービスです</h3>
+            <p>本サービスは、市民の声を行政に届けることを目的とした非営利活動です。収益を目的とした個人情報の販売・提供は一切行いません。投稿いただいた情報は、陳情書の生成と通知メールの送信のみに使用されます。</p>
+        </div>
+
+        <div class="policy-section">
+            <h2>第1条　収集する情報</h2>
+            <p>本サービスでは、フォームへの投稿時に以下の情報を収集します。</p>
+            <ul>
+                <li>お住まいの都道府県・市区町村</li>
+                <li>年代・性別・職業（任意）</li>
+                <li>行政に対するご意見・ご不満の内容</li>
+                <li>メールアドレス（陳情書生成の通知目的）</li>
+            </ul>
+            <div class="highlight-box">
+                <p style="margin:0; color:#aaa; font-size:0.88rem;">⚠️ メールアドレスおよびご意見の内容は、公開サイトには一切表示されません。運営スタッフと陳情書生成AIのみがアクセスします。</p>
+            </div>
+        </div>
+
+        <div class="policy-section">
+            <h2>第2条　情報の利用目的</h2>
+            <p>収集した情報は、以下の目的のみに使用します。</p>
+            <ul>
+                <li>AIによる陳情書の自動生成</li>
+                <li>陳情書の生成完了・提出状況に関するメール通知</li>
+                <li>スパム・悪用防止のための内部チェック</li>
+                <li>サービスの品質改善のための匿名統計分析</li>
+            </ul>
+        </div>
+
+        <div class="policy-section">
+            <h2>第3条　第三者への提供</h2>
+            <p>以下の場合を除き、収集した個人情報を第三者に提供することはありません。</p>
+            <ul>
+                <li>ご本人の同意がある場合</li>
+                <li>法令に基づく開示が必要な場合</li>
+            </ul>
+            <p>なお、陳情書を自治体に提出する際、提出者の個人情報（氏名・住所等）は含まれません。</p>
+        </div>
+
+        <div class="policy-section">
+            <h2>第4条　AIの利用について</h2>
+            <p>本サービスでは、Google社が提供するGemini AIを使用して陳情書を生成します。入力されたご意見の内容はAIの処理に使用されますが、Google社のAPIポリシーに従い管理されます。</p>
+            <p>生成された陳情書は運営スタッフが内容を確認・修正したうえで提出します。AIの出力をそのまま提出することはありません。</p>
+        </div>
+
+        <div class="policy-section">
+            <h2>第5条　データの保管・削除</h2>
+            <p>収集した情報はGoogleスプレッドシートにて管理されます。陳情書の提出完了後、メールアドレス等の個人情報は適切な時期に削除します。削除を希望される場合は下記お問い合わせ先までご連絡ください。</p>
+        </div>
+
+        <div class="policy-section">
+            <h2>第6条　セキュリティ</h2>
+            <p>本サービスは個人情報の保護に努めており、以下の対策を実施しています。</p>
+            <ul>
+                <li>メールアドレス等の個人情報は公開CSVに含まれない設計</li>
+                <li>データへのアクセス権限を運営スタッフのみに制限</li>
+                <li>通信はすべてHTTPS（SSL）で暗号化</li>
+            </ul>
+        </div>
+
+        <div class="policy-section">
+            <h2>第7条　お問い合わせ</h2>
+            <p>個人情報の取り扱いに関するご質問・削除依頼は、以下までご連絡ください。</p>
+            <div class="highlight-box">
+                <p style="margin:0; color:#ccc;">令和ボイス 運営事務局<br>
+                メールアドレス：<a href="mailto:info@health-gear.net" style="color:var(--accent-red);">info@health-gear.net</a></p>
+            </div>
+        </div>
+
+        <p class="updated">最終更新日：2025年1月</p>
+
+    </div>
+
+    <footer>
+        <p style="color:#888; font-size:0.8rem; margin-bottom:6px;">令和ボイスは、市民と行政をつなぐ非営利のシビックテックサービスです。</p>
+        <p>© 2025 令和ボイス All Rights Reserved.</p>
+        <p>
+            <a href="index.html">トップ</a>
+            <a href="about.html">使い方</a>
+            <a href="form.html">不満を投稿</a>
+            <a href="petitions.html">陳情書一覧</a>
+            <a href="results.html">活動実績</a>
+            <a href="privacy.html">プライバシーポリシー</a>
+        </p>
+    </footer>
+
+    <script>
+        function toggleNav() {
+            document.getElementById('main-nav').classList.toggle('open');
+        }
+    </script>
+
+</body>
+</html>
