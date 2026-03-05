@@ -551,6 +551,43 @@
             background: var(--primary);
             color: white;
         }
+
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-top: -2rem;
+            margin-bottom: 2rem;
+        }
+
+        .region-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+        }
+
+        .region-btn {
+            display: block;
+            text-align: center;
+            padding: 1.25rem 1rem;
+            background: var(--bg);
+            border: 2px solid var(--primary-light);
+            border-radius: var(--radius-lg);
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .region-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
@@ -627,6 +664,21 @@
                     <h3>議員が自治体に届ける</h3>
                     <p>へずまりゅう議員を含むチーム議員が、あなたの声を正式に自治体に届けます。</p>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section section-gray">
+        <div class="section-container">
+            <h2 class="section-title">お住まいの地域から陳情書を探す</h2>
+            <p class="section-subtitle">全国各地の市民の声を地域別に確認できます。</p>
+            <div class="region-grid">
+                <a href="petitions.html" class="region-btn">🗾 北海道・東北</a>
+                <a href="petitions.html" class="region-btn">🏙️ 関東</a>
+                <a href="petitions.html" class="region-btn">🗻 中部</a>
+                <a href="petitions.html" class="region-btn">⛩️ 近畿</a>
+                <a href="petitions.html" class="region-btn">🌊 中国・四国</a>
+                <a href="petitions.html" class="region-btn">🌺 九州・沖縄</a>
             </div>
         </div>
     </div>
