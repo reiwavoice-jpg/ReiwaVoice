@@ -516,9 +516,11 @@ function buildCard(p) {
             <span class="status-badge ${statusClass}">${statusLabel}</span>
             <span class="pref-badge">📍 ${escHtml(p.prefecture)}${p.municipality ? ' ' + escHtml(p.municipality) : ''}</span>
             ${p.category ? `<span class="category-badge">${escHtml(p.category)}</span>` : ''}
-            ${ageGender ? `<span class="card-meta" style="color:#666;">${ageGender}</span>` : ''}
         </div>
-        <h3>${escHtml(title)}</h3>
+        <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;">
+            <h3 style="margin:0;">${escHtml(title)}</h3>
+            ${ageGender ? `<span style="font-size:0.82rem;color:#666;white-space:nowrap;">${ageGender}</span>` : ''}
+        </div>
         <p class="petition-summary">${escHtml(summary)}</p>
         <div class="card-bottom">
             <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
