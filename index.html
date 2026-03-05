@@ -261,9 +261,9 @@
 
     <script>
         // ===== スプレッドシート設定 =====
-        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQpmRYjyz365eM2kyhPenekUNsQSNF_0o7tDnBve_K7djXMs7WQocFWhjLSfysuFdY3Bp0tKhh0tK2y/pub?gid=2064671577&single=true&output=csv';
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQpmRYjyz365eM2kyhPenekUNsQSNF_0o7tDnBve_K7djXMs7WQocFWhjLSfysuFdY3Bp0tKhh0tK2y/pub?gid=1599355687&single=true&output=csv';
         const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzl9Qt83DpHWsE6QaUY6VCuofFsoABP33d6Bq-7uCSGoEnOjxnyKN4paQNH0oA9t7Nn6w/exec';
-        const COL = { timestamp:0, prefecture:1, municipality:2, age:3, gender:4, complaint:6, category:7, status:11, petitionUrl:12, likeCount:14, title:15 };
+        const COL = { timestamp:0, prefecture:1, municipality:2, age:3, gender:4, category:5, status:6, petitionUrl:7, likeCount:8, title:9 };
         let likedSet = new Set(JSON.parse(localStorage.getItem('liked') || '[]'));
 
         // ===== データ読み込み =====
@@ -385,7 +385,7 @@
                                 <span class="petition-list-status ${statusClass}">${escHtml(statusLabel)}</span>
                                 ${(p.age || p.gender) ? `<span style="font-size:0.72rem;color:#666;">${[p.age, p.gender].filter(Boolean).map(escHtml).join(' ／ ')}</span>` : ''}
                             </div>
-                            <div class="petition-list-complaint">${p.title ? escHtml(p.title) : (p.complaint ? '【' + escHtml(p.category || '行政問題') + '】に関する陳情' : '内容確認中')}</div>
+                            <div class="petition-list-complaint">${p.title ? escHtml(p.title) : (p.category ? '【' + escHtml(p.category) + '】に関する陳情' : '内容確認中')}</div>
                             <div class="petition-list-footer">
                                 ${link}
                                 <button id="pl-like-${rowNum}" class="pl-like-btn ${isLiked ? 'liked' : ''}" onclick="plToggleLike(${rowNum})" ${isLiked ? 'disabled' : ''}>

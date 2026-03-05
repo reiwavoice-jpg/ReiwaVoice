@@ -295,7 +295,7 @@
 // 設定
 // =====================================================================
 // ▼ Googleスプレッドシート「ウェブに公開」で発行したCSV URL
-const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQpmRYjyz365eM2kyhPenekUNsQSNF_0o7tDnBve_K7djXMs7WQocFWhjLSfysuFdY3Bp0tKhh0tK2y/pub?gid=2064671577&single=true&output=csv';
+const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQpmRYjyz365eM2kyhPenekUNsQSNF_0o7tDnBve_K7djXMs7WQocFWhjLSfysuFdY3Bp0tKhh0tK2y/pub?gid=1599355687&single=true&output=csv';
 
 // ▼ GAS デプロイ後にURLを貼り付ける（reiwavoice_api.gs をデプロイして取得）
 const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzl9Qt83DpHWsE6QaUY6VCuofFsoABP33d6Bq-7uCSGoEnOjxnyKN4paQNH0oA9t7Nn6w/exec';
@@ -305,21 +305,15 @@ const PER_PAGE  = 10; // 1ページあたりの表示件数
 // 列インデックス（0始まり） ← スプレッドシートの列構成に基づく
 const COL = {
     timestamp    : 0,
-    prefecture   : 1,   // Q1 都道府県
-    municipality : 2,   // Q2 市区町村
-    ageGroup     : 3,   // Q3-1 年代
-    gender       : 4,   // Q3-2 性別
-    occupation   : 5,   // Q3-3 職業（任意）
-    complaint    : 6,   // Q4 不満内容
-    category     : 7,   // Q5 カテゴリ
-    // 8: Q6 業務妨害禁止（非表示）
-    // 9: Q7 ヒューマンチェック（非表示）
-    // 10: Q8 メール（非表示）
-    status       : 11,  // ステータス
-    petitionUrl  : 12,  // 生成された陳情書URL
-    // 13: 送信メールステータス（非表示）
-    likeCount    : 14,  // O列: 賛同数
-    title        : 15,  // P列: AIタイトル（個人情報なし）
+    prefecture   : 1,   // 都道府県
+    municipality : 2,   // 市区町村
+    ageGroup     : 3,   // 年代
+    gender       : 4,   // 性別
+    category     : 5,   // カテゴリ（公開用シートH列→5番目）
+    status       : 6,   // ステータス（公開用シートL列→6番目）
+    petitionUrl  : 7,   // 陳情書URL（公開用シートM列→7番目）
+    likeCount    : 8,   // 賛同数（公開用シートO列→8番目）
+    title        : 9,   // AIタイトル（公開用シートP列→9番目）
 };
 
 // =====================================================================
@@ -414,7 +408,7 @@ function rowsToObjects(rows) {
         .filter(p =>
             p.prefecture
             && p.prefecture !== 'Q1. お住まいの都道府県を選択してください'
-            && (p.complaint || p.petitionUrl)
+            && (p.title || p.petitionUrl)
         );
 }
 
@@ -450,7 +444,7 @@ function applyFilters() {
 
         const kw = activeFilters.keyword.toLowerCase();
         const matchKw = !kw
-            || p.complaint.toLowerCase().includes(kw)
+            || (p.title || '').toLowerCase().includes(kw)
             || p.municipality.toLowerCase().includes(kw)
             || p.prefecture.toLowerCase().includes(kw)
             || p.category.toLowerCase().includes(kw);
