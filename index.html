@@ -492,22 +492,34 @@
                 const cat  = r.category ? `【${escHtml(r.category)}】` : '';
                 const badge = getStatusBadge(r.status);
                 const likes = r.likeCount || 0;
+                const rowNum = r.id + 2;
+                const likeKey = `row_${rowNum}`;
+                const isLiked = likedSet.has(likeKey);
                 const link  = (r.petitionUrl && (r.status === '送付準備' || r.status === '送付完了'))
                     ? `<a href="${escHtml(r.petitionUrl)}" target="_blank" class="doc-link">📄 陳情書全文を読む</a>`
                     : `<span style="color:#555;">${r.petitionUrl ? '確認中…' : '陳情書生成中…'}</span>`;
                 const displayText = r.title
                     ? escHtml(r.title)
                     : (r.category ? `【${escHtml(r.category)}】に関する市民の声` : '行政への陳情');
+                const ageGender = [r.age, r.gender].filter(Boolean).map(escHtml).join(' ／ ');
+                const shareTitle = encodeURIComponent((r.title || '行政への陳情') + ' | 令和ボイス');
+                const shareUrl = encodeURIComponent('https://r-voice.tech/petitions.html');
                 return `
                 <div class="petition-card">
                     <div class="status-badge">${badge}</div>
                     <h3 style="color:#fff;">【${escHtml(loc)}】${cat}への追及</h3>
+                    ${ageGender ? `<p style="font-size:0.82rem;color:#666;margin:-10px 0 10px;">${ageGender}</p>` : ''}
                     <p style="color:#bbb;">${displayText}</p>
                     <div class="action-area">
                         ${link}
-                        <button class="like-btn" disabled>
-                            <span>🔥 賛同数</span><span>${likes.toLocaleString()}</span>
+                        <button id="pl-like-${rowNum}" class="like-btn ${isLiked ? 'clicked' : ''}" onclick="plToggleLike(${rowNum})" ${isLiked ? 'disabled' : ''}>
+                            <span>🔥 賛同数</span><span id="pl-count-${rowNum}">${likes.toLocaleString()}</span>
                         </button>
+                    </div>
+                    <div class="pl-share-area" style="margin-top:12px;">
+                        <a href="https://twitter.com/intent/tweet?text=${shareTitle}&url=${shareUrl}" target="_blank" rel="noopener" class="pl-share-btn">𝕏 シェア</a>
+                        <a href="https://www.threads.net/intent/post?text=${shareTitle}%20${shareUrl}" target="_blank" rel="noopener" class="pl-share-btn">Threads</a>
+                        <a href="https://line.me/R/msg/text/?${shareTitle}%20${shareUrl}" target="_blank" rel="noopener" class="pl-share-btn">LINE</a>
                     </div>
                 </div>`;
             }).join('');
