@@ -280,6 +280,7 @@
 </div>
 
 <footer>
+    <p style="color:#888; font-size:0.8rem; margin-bottom:6px;">令和ボイスは、市民と行政をつなぐ非営利のシビックテックサービスです。</p>
     <p>© 2025 令和ボイス All Rights Reserved.</p>
     <p>
         <a href="index.html">トップ</a>
@@ -287,6 +288,7 @@
         <a href="form.html">不満を投稿</a>
         <a href="petitions.html">陳情書一覧</a>
         <a href="results.html">活動実績</a>
+        <a href="privacy.html">プライバシーポリシー</a>
     </p>
 </footer>
 
@@ -299,6 +301,7 @@ const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQpmRYjyz365e
 
 // ▼ GAS デプロイ後にURLを貼り付ける（reiwavoice_api.gs をデプロイして取得）
 const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzl9Qt83DpHWsE6QaUY6VCuofFsoABP33d6Bq-7uCSGoEnOjxnyKN4paQNH0oA9t7Nn6w/exec';
+const GAS_SECRET  = 'reiwa2024voice!secure';
 
 const PER_PAGE  = 10; // 1ページあたりの表示件数
 
@@ -590,7 +593,7 @@ async function addLike(id) {
     if (GAS_API_URL && GAS_API_URL !== 'YOUR_GAS_DEPLOY_URL_HERE') {
         try {
             // mode:'no-cors' でCORSを回避（レスポンスは読めないが書き込みは実行される）
-            await fetch(`${GAS_API_URL}?action=like&rowNum=${p.sheetRowNum}`, {
+            await fetch(`${GAS_API_URL}?action=like&rowNum=${p.sheetRowNum}&secret=${GAS_SECRET}`, {
                 method: 'GET',
                 mode: 'no-cors'
             });
