@@ -402,6 +402,17 @@
             margin-top: 1rem;
         }
 
+        .petition-link-pending {
+            display: inline-block;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-top: 1rem;
+            padding: 0.35rem 0.75rem;
+            background: var(--bg-dark);
+            border-radius: var(--radius);
+        }
+
         .petition-link:hover {
             text-decoration: underline;
         }
@@ -480,8 +491,8 @@
                     <label for="filter-status">ステータス</label>
                     <select id="filter-status" onchange="filterPetitions()">
                         <option value="">すべて</option>
-                        <option value="募集中">募集中</option>
-                        <option value="準備中">提出準備中</option>
+                        <option value="募集中">確認中</option>
+                        <option value="準備中">送付準備中</option>
                         <option value="送付済">送付済み</option>
                         <option value="承認済">承認済</option>
                     </select>
@@ -565,9 +576,9 @@
                             prefecture: cells[COL.prefecture],
                             municipality: cells[COL.municipality],
                             title: cells[COL.title],
-                            status: cells[COL.status],
+                            status: cells[COL.status] || '',
                             likeCount: parseInt(cells[COL.likeCount]) || 0,
-                            petitionUrl: cells[COL.petitionUrl],
+                            petitionUrl: cells[COL.petitionUrl] || '',
                             index: i
                         });
                         prefectures.add(cells[COL.prefecture]);
@@ -644,7 +655,10 @@
                     <div class="like-count">
                         ❤️ ${p.likeCount}
                     </div>
-                    ${p.petitionUrl ? `<a href="${p.petitionUrl}" target="_blank" class="petition-link">詳細を見る →</a>` : ''}
+                    ${(p.petitionUrl && (p.status.includes('送付') || p.status.includes('承認')))
+                        ? `<a href="${p.petitionUrl}" target="_blank" class="petition-link">詳細を見る →</a>`
+                        : `<span class="petition-link-pending">🕐 確認中</span>`
+                    }
                 </div>
             `).join('');
         }
