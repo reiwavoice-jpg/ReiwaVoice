@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>陳情書一覧 - 令和ボイス</title>
+    <style>
+        :root {
+            --primary: #1e40af;
+            --primary-light: #dbeafe;
+            --primary-dark: #1e3a8a;
+            --secondary: #059669;
+            --secondary-light: #d1fae5;
+            --bg: #ffffff;
+            --bg-gray: #f8fafc;
+            --bg-dark: #f1f5f9;
+            --text: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --radius: 12px;
+            --radius-lg: 20px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans JP', sans-serif;
+            color: var(--text);
+            background: var(--bg);
+            line-height: 1.6;
+        }
+
+        header {
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .logo span {
+            color: var(--secondary);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 0.375rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .hamburger span {
+            width: 1.5rem;
+            height: 2px;
+            background: var(--primary);
+            transition: all 0.3s;
+        }
+
+        #main-nav {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        #main-nav a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        #main-nav a:hover {
+            color: var(--primary);
+        }
+
+        .nav-cta {
+            background: var(--primary) !important;
+            color: white !important;
+            padding: 0.5rem 1.25rem !important;
+            border-radius: var(--radius);
+            transition: background 0.3s;
+        }
+
+        .nav-cta:hover {
+            background: var(--primary-dark) !important;
+        }
+
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+
+            #main-nav {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                flex-direction: column;
+                background: var(--bg);
+                border-bottom: 1px solid var(--border);
+                padding: 1rem;
+                gap: 1rem;
+            }
+
+            #main-nav.active {
+                display: flex;
+            }
+        }
+
+        footer {
+            background: var(--bg-gray);
+            border-top: 1px solid var(--border);
+            padding: 3rem 0 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .footer-top {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .footer-brand .logo {
+            font-size: 1.25rem;
+        }
+
+        .footer-brand p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .footer-nonprofit {
+            display: inline-block;
+            background: var(--secondary-light);
+            color: var(--secondary);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius);
+            font-size: 0.75rem;
+            font-weight: 600;
+            width: fit-content;
+        }
+
+        .footer-col {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .footer-col h4 {
+            color: var(--text);
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .footer-col a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.3s;
+        }
+
+        .footer-col a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .footer-top {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .page-hero {
+            background: linear-gradient(180deg, var(--primary-light) 0%, var(--bg) 100%);
+            padding: 3rem 1rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .page-hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        .page-hero p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .section {
+            padding: 3rem 1rem;
+        }
+
+        .filter-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--text);
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .petitions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .petition-card {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .petition-card:hover {
+            box-shadow: var(--shadow);
+            transform: translateY(-4px);
+        }
+
+        .petition-location {
+            display: inline-block;
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            width: fit-content;
+        }
+
+        .petition-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+            line-height: 1.4;
+            flex-grow: 1;
+        }
+
+        .petition-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .status-募集中 {
+            background: #3b82f6;
+        }
+
+        .status-準備中 {
+            background: #f59e0b;
+        }
+
+        .status-送付済 {
+            background: #8b5cf6;
+        }
+
+        .status-承認済 {
+            background: #10b981;
+        }
+
+        .like-count {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            color: var(--secondary);
+            font-weight: 600;
+            margin-top: auto;
+        }
+
+        .like-btn {
+            background: none;
+            border: 1px solid var(--secondary);
+            color: var(--secondary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .like-btn:hover {
+            background: var(--secondary-light);
+        }
+
+        .petition-link {
+            display: inline-block;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .petition-link:hover {
+            text-decoration: underline;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 3rem;
+        }
+
+        .pagination button,
+        .pagination a {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            border-radius: var(--radius);
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .pagination button:hover,
+        .pagination a:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .pagination .active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-inner">
+            <a href="index.html" class="logo">令和<span>ボイス</span></a>
+            <button class="hamburger" onclick="toggleNav()"><span></span><span></span><span></span></button>
+            <nav id="main-nav">
+                <a href="about.html">使い方</a>
+                <a href="petitions.html">陳情書一覧</a>
+                <a href="results.html">活動実績</a>
+                <a href="team.html">チーム</a>
+                <a href="form.html" class="nav-cta">声を届ける</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-hero">
+        <div class="container">
+            <h1>陳情書一覧</h1>
+            <p>市民の声から生成された陳情書を確認し、賛同することで声を届けます。</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="container">
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <label for="filter-status">ステータス</label>
+                    <select id="filter-status" onchange="filterPetitions()">
+                        <option value="">すべて</option>
+                        <option value="募集中">募集中</option>
+                        <option value="準備中">提出準備中</option>
+                        <option value="送付済">送付済み</option>
+                        <option value="承認済">承認済</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-prefecture">都道府県</label>
+                    <select id="filter-prefecture" onchange="filterPetitions()">
+                        <option value="">すべて</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filter-search">キーワード検索</label>
+                    <input type="text" id="filter-search" placeholder="タイトルで検索..." onkeyup="filterPetitions()">
+                </div>
+            </div>
+
+            <div class="petitions-grid" id="petitions-container">
+                <p style="grid-column: 1/-1; text-align: center;">陳情書を読み込み中...</p>
+            </div>
+
+            <div class="pagination" id="pagination"></div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-inner">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <a href="index.html" class="logo">令和<span>ボイス</span></a>
+                    <p>市民の声を政治の場に届ける、非営利のシビックテックサービスです。</p>
+                    <span class="footer-nonprofit">✅ 非営利サービス｜完全無料</span>
+                </div>
+                <div class="footer-col">
+                    <h4>サービス</h4>
+                    <a href="about.html">使い方・仕組み</a>
+                    <a href="form.html">不満を投稿する</a>
+                    <a href="petitions.html">陳情書一覧</a>
+                    <a href="results.html">活動実績</a>
+                </div>
+                <div class="footer-col">
+                    <h4>運営</h4>
+                    <a href="team.html">チーム紹介</a>
+                    <a href="privacy.html">プライバシーポリシー</a>
+                    <a href="../index.html">旧サイトへ</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2025 令和ボイス All Rights Reserved. 令和ボイスは非営利のシビックテックサービスです。</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQpmRYjyz365eM2kyhPenekUNsQSNF_0o7tDnBve_K7djXMs7WQocFWhjLSfysuFdY3Bp0tKhh0tK2y/pub?gid=1599355687&single=true&output=csv';
+        const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzl9Qt83DpHWsE6QaUY6VCuofFsoABP33d6Bq-7uCSGoEnOjxnyKN4paQNH0oA9t7Nn6w/exec';
+        const GAS_SECRET = 'reiwa2024voice!secure';
+        const COL = { timestamp:0, prefecture:1, municipality:2, age:3, gender:4, category:5, status:6, petitionUrl:7, likeCount:8, title:9 };
+
+        let allPetitions = [];
+        let currentPage = 1;
+        const itemsPerPage = 12;
+
+        function toggleNav() {
+            const nav = document.getElementById('main-nav');
+            nav.classList.toggle('active');
+        }
+
+        async function loadPetitions() {
+            try {
+                const response = await fetch(SHEET_URL);
+                const csv = await response.text();
+                const lines = csv.trim().split('\n');
+                
+                allPetitions = [];
+                const prefectures = new Set();
+
+                for (let i = 1; i < lines.length; i++) {
+                    const cells = lines[i].split(',').map(c => c.trim().replace(/^"(.*)"$/, '$1'));
+                    if (cells.length > COL.title && cells[COL.title]) {
+                        allPetitions.push({
+                            prefecture: cells[COL.prefecture],
+                            municipality: cells[COL.municipality],
+                            title: cells[COL.title],
+                            status: cells[COL.status],
+                            likeCount: parseInt(cells[COL.likeCount]) || 0,
+                            petitionUrl: cells[COL.petitionUrl],
+                            index: i
+                        });
+                        prefectures.add(cells[COL.prefecture]);
+                    }
+                }
+
+                populatePrefectureFilter(Array.from(prefectures).sort());
+                filterPetitions();
+            } catch (error) {
+                console.error('Petitions loading error:', error);
+                document.getElementById('petitions-container').innerHTML = '<p style="grid-column: 1/-1; text-align: center;">陳情書の読み込みに失敗しました</p>';
+            }
+        }
+
+        function populatePrefectureFilter(prefectures) {
+            const select = document.getElementById('filter-prefecture');
+            prefectures.forEach(pref => {
+                const option = document.createElement('option');
+                option.value = pref;
+                option.textContent = pref;
+                select.appendChild(option);
+            });
+        }
+
+        function filterPetitions() {
+            const statusFilter = document.getElementById('filter-status').value;
+            const prefectureFilter = document.getElementById('filter-prefecture').value;
+            const searchFilter = document.getElementById('filter-search').value.toLowerCase();
+
+            const filtered = allPetitions.filter(p => {
+                return (!statusFilter || getStatusCategory(p.status) === statusFilter) &&
+                       (!prefectureFilter || p.prefecture === prefectureFilter) &&
+                       (p.title.toLowerCase().includes(searchFilter) || 
+                        p.municipality.toLowerCase().includes(searchFilter));
+            });
+
+            currentPage = 1;
+            renderPetitions(filtered);
+            renderPagination(filtered);
+        }
+
+        function getStatusCategory(status) {
+            if (status.includes('募集') || status.includes('受付')) return '募集中';
+            if (status.includes('準備')) return '準備中';
+            if (status.includes('送付')) return '送付済';
+            if (status.includes('承認')) return '承認済';
+            return status;
+        }
+
+        function getStatusBadgeClass(status) {
+            const category = getStatusCategory(status);
+            return `status-${category.replace(/[中済]/g, '')}`;
+        }
+
+        function renderPetitions(petitions) {
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pagePetitions = petitions.slice(start, end);
+
+            const container = document.getElementById('petitions-container');
+            
+            if (pagePetitions.length === 0) {
+                container.innerHTML = '<div class="empty-state" style="grid-column: 1/-1;"><h3>陳情書がみつかりません</h3><p>条件を変更して検索してください。</p></div>';
+                return;
+            }
+
+            container.innerHTML = pagePetitions.map(p => `
+                <div class="petition-card">
+                    <div class="petition-location">${p.prefecture} ${p.municipality}</div>
+                    <h3>${p.title}</h3>
+                    <div class="petition-meta">
+                        <span class="status-badge ${getStatusBadgeClass(p.status)}">${p.status}</span>
+                    </div>
+                    <div class="like-count">
+                        ❤️ ${p.likeCount}
+                    </div>
+                    ${p.petitionUrl ? `<a href="${p.petitionUrl}" target="_blank" class="petition-link">詳細を見る →</a>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function renderPagination(petitions) {
+            const totalPages = Math.ceil(petitions.length / itemsPerPage);
+            const container = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            if (currentPage > 1) {
+                html += `<button onclick="changePage(${currentPage - 1})">前へ</button>`;
+            }
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === currentPage) {
+                    html += `<span class="active" style="padding: 0.5rem 1rem; border: 1px solid var(--primary); background: var(--primary); color: white; border-radius: var(--radius);">${i}</span>`;
+                } else {
+                    html += `<button onclick="changePage(${i})">${i}</button>`;
+                }
+            }
+
+            if (currentPage < totalPages) {
+                html += `<button onclick="changePage(${currentPage + 1})">次へ</button>`;
+            }
+
+            container.innerHTML = html;
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            filterPetitions();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadPetitions);
+    </script>
+</body>
+</html>
