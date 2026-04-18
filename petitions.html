@@ -303,7 +303,6 @@ const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQpmRYjyz365e
 
 // ▼ GAS デプロイ後にURLを貼り付ける（reiwavoice_api.gs をデプロイして取得）
 const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzl9Qt83DpHWsE6QaUY6VCuofFsoABP33d6Bq-7uCSGoEnOjxnyKN4paQNH0oA9t7Nn6w/exec';
-const GAS_SECRET  = 'u0Q3R3RbpuuGc1kV8BiGancjzXy2QZCG63_FhgOT0lU';
 
 const PER_PAGE  = 10; // 1ページあたりの表示件数
 
@@ -595,7 +594,7 @@ async function addLike(id) {
     if (GAS_API_URL && GAS_API_URL !== 'YOUR_GAS_DEPLOY_URL_HERE') {
         try {
             // mode:'no-cors' でCORSを回避（レスポンスは読めないが書き込みは実行される）
-            await fetch(`${GAS_API_URL}?action=like&rowNum=${p.sheetRowNum}&secret=${GAS_SECRET}`, {
+            await fetch(`${GAS_API_URL}?action=like&rowNum=${p.sheetRowNum}`, {
                 method: 'GET',
                 mode: 'no-cors'
             });
